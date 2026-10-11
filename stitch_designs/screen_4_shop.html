@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-container": "#ee9800", "error": "#ffb4ab", "error-container": "#93000a", "primary-fixed": "#eaddff", "on-surface": "#e7defa", "outline": "#958da1", "on-primary-fixed": "#25005a", "tertiary-fixed-dim": "#4cd7f6", "on-secondary-container": "#5b3800", "on-tertiary": "#003640", "surface-container-lowest": "#0f0b1e", "on-tertiary-fixed-variant": "#004e5c", "primary-fixed-dim": "#d2bbff", "surface": "#151024", "tertiary": "#4cd7f6", "on-tertiary-container": "#b7efff", "on-error-container": "#ffdad6", "on-background": "#e7defa", "on-secondary-fixed": "#2a1700", "surface-tint": "#d2bbff", "on-secondary-fixed-variant": "#653e00", "on-secondary": "#472a00", "outline-variant": "#4a4455", "primary-container": "#7c3aed", "surface-container-highest": "#363247", "tertiary-container": "#007184", "on-tertiary-fixed": "#001f26", "surface-container-high": "#2b273c", "primary": "#d2bbff", "surface-container-low": "#1d192c", "tertiary-fixed": "#acedff", "surface-container": "#211d31", "secondary-fixed-dim": "#ffb95f", "on-error": "#690005", "inverse-primary": "#732ee4", "on-primary-fixed-variant": "#5a00c6", "secondary": "#ffb95f", "surface-dim": "#151024", "on-primary-container": "#ede0ff", "background": "#151024", "on-surface-variant": "#ccc3d8", "inverse-surface": "#e7defa", "surface-variant": "#363247", "inverse-on-surface": "#322d42", "surface-bright": "#3b364b", "secondary-fixed": "#ffddb8", "on-primary": "#3f008e" }, "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" }, "spacing": { "margin": "1rem", "space-lg": "1.25rem", "space-md": "0.75rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "margin-md": "2rem", "gutter": "0.75rem", "gutter-md": "1.25rem", "space-xl": "2rem" }, "fontFamily": { "headline-md": ["Quicksand"], "headline-sm": ["Quicksand"], "display-lg-mobile": ["Quicksand"], "label-lg": ["Quicksand"], "body-lg": ["Quicksand"], "body-md": ["Quicksand"], "label-sm": ["Quicksand"], "label-md": ["Quicksand"], "headline-lg": ["Quicksand"], "display-lg": ["Quicksand"], "headline-lg-mobile": ["Quicksand"] }, "fontSize": { "headline-md": ["22px", {"lineHeight": "28px", "fontWeight": "600"}], "headline-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}], "display-lg-mobile": ["36px", {"lineHeight": "42px", "fontWeight": "700"}], "label-lg": ["16px", {"lineHeight": "20px", "fontWeight": "700"}], "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "500"}], "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}], "label-sm": ["11px", {"lineHeight": "14px", "fontWeight": "600"}], "label-md": ["13px", {"lineHeight": "16px", "fontWeight": "700"}], "headline-lg": ["32px", {"lineHeight": "38px", "fontWeight": "700"}], "display-lg": ["48px", {"lineHeight": "54px", "fontWeight": "700"}], "headline-lg-mobile": ["26px", {"lineHeight": "32px", "fontWeight": "700"}] } } } }</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md flex flex-col min-h-screen selection:bg-primary-container selection:text-on-primary-container"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_8px_24px_rgba(0,0,0,0.35)]"><div class="h-20 px-margin flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-xs"><img alt="Ball Sort Game Icon" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcOUfGRoYD7BLXLDnMVOwbDy7HXtxY7AxVC4m2OMQvRHRjQrQ2-fNf1T57jCB5ZXYdGfSRzivOOVqNA_ua-b-kujfxJNMkCYye0tCPFhszw8MFjWMcADcYKf6CD48RcS1RKMmR4gRiFrQ3k2_58wQWyjNXeqe7zDIKWPrtYnhzqK4Bdl5DPNtZtOEIXv2ohIcm1Epx6FWYUXHq6CO0wzjPmk9x7C_tZL1Ws-zv8wSkQjqnMpk7HiVbdg"/><div class="flex flex-col"><span class="font-label-md text-label-md text-on-surface tracking-wide leading-none">Ball Sort</span><span class="font-label-sm text-label-sm text-primary leading-tight font-bold">Shop</span></div></div><div class="flex items-center gap-space-xs"><div class="flex items-center bg-surface-container-high/90 px-space-xs py-1 rounded-full shadow-inner"><span class="material-symbols-outlined text-error text-[18px] mr-0.5">favorite</span><span class="font-label-sm text-label-sm text-on-surface font-bold">5/5</span><span class="font-label-sm text-label-sm text-on-surface-variant ml-1 scale-90">Full</span></div><div class="flex items-center bg-surface-container-high/90 px-space-xs py-1 rounded-full shadow-inner"><span class="material-symbols-outlined text-secondary text-[18px] mr-0.5">monetization_on</span><span class="font-label-sm text-label-sm text-secondary-fixed font-bold">2,450</span></div><div class="flex items-center bg-surface-container-high/90 px-space-xs py-1 rounded-full"><span class="font-label-sm text-label-sm text-tertiary font-bold">LV.42</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Game Settings" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-high/80 text-on-surface hover:text-primary transition-colors"><span class="material-symbols-outlined text-[20px]">settings</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-20 pb-28 bg-surface min-h-screen"><div class="flex flex-col w-full px-margin pb-space-xl">
+<!-- Currency Header Strip -->
+<div class="flex items-center justify-between w-full mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Wardrobe</span>
+<span class="bg-primary/20 text-primary font-label-sm text-label-sm px-space-xs py-0.5 rounded-full">New Set</span>
+</div>
+<!-- Balance Capsules -->
+<div class="flex items-center gap-space-xs">
+<div class="flex items-center bg-surface-container-high px-space-sm py-1 rounded-full shadow-inner">
+<span class="material-symbols-outlined text-secondary text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span class="font-label-sm text-label-sm text-secondary-fixed font-bold">2,450</span>
+</div>
+<div class="flex items-center bg-surface-container-high px-space-sm py-1 rounded-full shadow-inner">
+<span class="material-symbols-outlined text-tertiary text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">diamond</span>
+<span class="font-label-sm text-label-sm text-tertiary-fixed font-bold">35</span>
+</div>
+</div>
+</div>
+<!-- Segmented Tabs (3D Physical Style) -->
+<div class="w-full bg-surface-container-low p-1 rounded-full mb-space-lg flex items-center shadow-inner">
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md bg-primary-container text-on-primary-container shadow-[0_3px_0_#5b21b6,inset_0_1px_1px_rgba(255,255,255,0.4)] flex items-center justify-center gap-1 transition-transform active:translate-y-0.5">
+<span class="material-symbols-outlined text-[18px]">bubble_chart</span>
+<span>Balls</span>
+</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">science</span>
+<span>Tubes</span>
+</button>
+<button class="flex-1 py-2 rounded-full font-label-md text-label-md text-on-surface-variant hover:text-on-surface flex items-center justify-center gap-1 transition-colors">
+<span class="material-symbols-outlined text-[18px]">wallpaper</span>
+<span>Backdrops</span>
+</button>
+</div>
+<!-- Hero Interactive Preview Stage -->
+<div class="relative w-full rounded-lg bg-surface-container-low p-space-md mb-space-lg overflow-hidden shadow-xl">
+<!-- Ambient Specular Glow behind tube -->
+<div class="absolute -top-12 left-1/2 -translate-x-1/2 w-48 h-48 bg-primary/20 blur-3xl pointer-events-none rounded-full"></div>
+<div class="absolute -bottom-10 right-4 w-32 h-32 bg-secondary/15 blur-2xl pointer-events-none rounded-full"></div>
+<div class="relative z-10 flex items-center justify-between">
+<!-- Left: Equipped Set Info -->
+<div class="flex flex-col min-w-0 pr-space-sm">
+<div class="flex items-center gap-space-xs mb-1">
+<span class="material-symbols-outlined text-secondary text-[16px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-sm text-label-sm uppercase tracking-wider text-secondary font-bold">Currently Equipped</span>
+</div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-0.5 truncate" id="preview-title">Cosmic Glow</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-space-md">Neon refractive core with spectral stardust aura</p>
+<!-- Tactile Test Tap Orb Button -->
+<div class="flex items-center gap-2">
+<button class="bg-surface-container-high hover:bg-surface-container-highest text-on-surface px-space-md py-2 rounded-full font-label-sm text-label-sm flex items-center gap-1.5 shadow-[0_2px_0_#1d192c,inset_0_1px_1px_rgba(255,255,255,0.2)] active:translate-y-0.5 transition-transform" id="tap-tube-btn">
+<span class="material-symbols-outlined text-primary text-[18px]">touch_app</span>
+<span>Tap to Bounce</span>
+</button>
+<span class="font-label-sm text-label-sm text-outline">Set #01</span>
+</div>
+</div>
+<!-- Right: Real Skeuomorphic Glass Tube with Spheres -->
+<div class="relative flex flex-col items-center justify-end w-20 h-56 shrink-0 pb-2">
+<!-- Floating Lifted Orb Indicator -->
+<div class="absolute -top-2 w-12 h-12 rounded-full transition-all duration-300 transform -translate-y-1 shadow-[0_12px_24px_rgba(210,187,255,0.6)] flex items-center justify-center" id="elevated-orb" style="background: radial-gradient(circle at 35% 30%, #ede0ff 0%, #d2bbff 35%, #7c3aed 75%, #3f008e 100%);">
+<!-- Glass highlight spot -->
+<div class="w-3.5 h-3.5 rounded-full bg-surface-container-lowest/20 absolute top-1.5 left-2 border-t border-l border-white/60"></div>
+<span class="material-symbols-outlined text-[18px] text-white/90">arrow_back_ios_new</span>
+</div>
+<!-- Glass Tube Vessel Container -->
+<div class="relative w-16 h-44 rounded-b-full bg-white/5 backdrop-blur-md shadow-[inset_1.5px_1.5px_0_rgba(255,255,255,0.4),inset_-1.5px_-1.5px_0_rgba(255,255,255,0.08),0_12px_28px_rgba(0,0,0,0.5)] flex flex-col justify-end items-center gap-1 p-1.5 overflow-hidden">
+<!-- Tube Rim Highlight -->
+<div class="absolute top-0 inset-x-0 h-1.5 bg-white/30 rounded-t-sm shadow-sm"></div>
+<!-- Left Specular Streak Reflection -->
+<div class="absolute left-1 top-2 bottom-6 w-1 bg-gradient-to-b from-white/40 via-white/10 to-transparent rounded-full pointer-events-none"></div>
+<!-- Bottom Orb 3 -->
+<div class="w-12 h-12 rounded-full shrink-0 relative shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #b7efff 0%, #4cd7f6 40%, #007184 80%, #003640 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1.5 left-2 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">filter_vintage</span>
+</div>
+<!-- Bottom Orb 2 -->
+<div class="w-12 h-12 rounded-full shrink-0 relative shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffdad6 0%, #ff8b7d 45%, #ba1a1a 85%, #690005 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1.5 left-2 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">bolt</span>
+</div>
+<!-- Bottom Orb 1 -->
+<div class="w-12 h-12 rounded-full shrink-0 relative shadow-[0_4px_8px_rgba(0,0,0,0.5)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffddb8 0%, #ffb95f 40%, #ee9800 80%, #653e00 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1.5 left-2 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">wb_sunny</span>
+</div>
+</div>
+<!-- Pedestal Ring Stand -->
+<div class="w-12 h-2 rounded-full bg-surface-container-highest shadow-md -mt-1"></div>
+</div>
+</div>
+</div>
+<!-- Showcase Collections Title & Filter -->
+<div class="flex items-center justify-between mb-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="font-headline-sm text-headline-sm text-on-surface">Available Sets</span>
+<span class="font-label-sm text-label-sm text-outline">(6)</span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span>Rarity Filter</span>
+</div>
+</div>
+<!-- Grid of Unlockable Ball Skin Collections -->
+<div class="grid grid-cols-1 gap-space-md w-full">
+<!-- 1. Cosmic Glow (Equipped) -->
+<div class="w-full bg-surface-container rounded-DEFAULT p-space-md shadow-md relative overflow-hidden transition-all duration-200">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Cosmic Glow</span>
+<span class="bg-primary/20 text-primary-fixed-dim font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Legendary</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">4 Glowing prismatic nebulas</span>
+</div>
+<span class="material-symbols-outlined text-primary text-[22px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<!-- 4 Spheres preview -->
+<div class="flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Sphere A -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ede0ff 0%, #d2bbff 40%, #7c3aed 80%, #3f008e 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[14px] text-white/90">arrow_back_ios_new</span>
+</div>
+<!-- Sphere B -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #b7efff 0%, #4cd7f6 40%, #007184 80%, #003640 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[14px] text-white/90">filter_vintage</span>
+</div>
+<!-- Sphere C -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffdad6 0%, #ff8b7d 40%, #ba1a1a 80%, #690005 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[14px] text-white/90">bolt</span>
+</div>
+<!-- Sphere D -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffddb8 0%, #ffb95f 40%, #ee9800 80%, #653e00 100%);">
+<div class="w-3 h-3 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[14px] text-white/90">wb_sunny</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full h-12 rounded-full font-label-lg text-label-lg bg-surface-container-high text-on-surface-variant flex items-center justify-center gap-1.5 opacity-80 cursor-default" disabled="">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+<span>EQUIPPED</span>
+</button>
+</div>
+<!-- 2. Juicy Fruits (Owned / EQUIP CTA) -->
+<div class="w-full bg-surface-container rounded-DEFAULT p-space-md shadow-md relative overflow-hidden transition-all duration-200">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Juicy Fruits</span>
+<span class="bg-secondary/20 text-secondary-fixed-dim font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Rare</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Watermelon, Orange, Blueberry &amp; Lime</span>
+</div>
+<span class="bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full">Owned</span>
+</div>
+<!-- 4 Spheres preview -->
+<div class="flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Watermelon -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ff8b7d 0%, #e11d48 50%, #881337 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[15px] text-white">nutrition</span>
+</div>
+<!-- Orange -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fed7aa 0%, #ea580c 50%, #7c2d12 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[15px] text-white">lunch_dining</span>
+</div>
+<!-- Blueberry -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #bfdbfe 0%, #2563eb 50%, #172554 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[15px] text-white">radio_button_checked</span>
+</div>
+<!-- Lime -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #bbf7d0 0%, #16a34a 50%, #14532d 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/60"></div>
+<span class="material-symbols-outlined text-[15px] text-white">eco</span>
+</div>
+</div>
+<!-- Action Button (3D Amethyst CTA) -->
+<button class="w-full h-12 rounded-full font-label-lg text-label-lg bg-primary-container text-on-primary-container shadow-[0_4px_0_#5b21b6,inset_0_1px_1px_rgba(255,255,255,0.4)] active:translate-y-1 active:shadow-[0_1px_0_#5b21b6] transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]">check</span>
+<span>EQUIP SET</span>
+</button>
+</div>
+<!-- 3. Emoji Fun (1,500 Coins) -->
+<div class="w-full bg-surface-container rounded-DEFAULT p-space-md shadow-md relative overflow-hidden transition-all duration-200">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Emoji Fun</span>
+<span class="bg-outline-variant text-on-surface-variant font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Common</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Joy, Cool Shades, Hearts &amp; Shocked</span>
+</div>
+<div class="flex items-center text-secondary-fixed font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-secondary text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>1,500</span>
+</div>
+</div>
+<!-- 4 Spheres preview -->
+<div class="flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Joy -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fef08a 0%, #eab308 55%, #713f12 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[18px] text-on-secondary">sentiment_very_satisfied</span>
+</div>
+<!-- Cool Shades -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fed7aa 0%, #f97316 55%, #7c2d12 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[18px] text-white">video_file</span>
+</div>
+<!-- Hearts -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fecdd3 0%, #f43f5e 55%, #881337 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[18px] text-white">favorite</span>
+</div>
+<!-- Shocked -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #bae6fd 0%, #0284c7 55%, #082f49 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[18px] text-white">sentiment_very_dissatisfied</span>
+</div>
+</div>
+<!-- Action Button (3D Amber Gold Play Button) -->
+<button class="w-full h-12 rounded-full font-label-lg text-label-lg bg-secondary-container text-on-secondary-container shadow-[0_4px_0_#b45309,inset_0_1px_1px_rgba(255,255,255,0.4)] active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-on-secondary-container text-[20px]" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span>UNLOCK FOR 1,500</span>
+</button>
+</div>
+<!-- 4. Elemental Orbs (2,500 Coins) -->
+<div class="w-full bg-surface-container rounded-DEFAULT p-space-md shadow-md relative overflow-hidden transition-all duration-200">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Elemental Orbs</span>
+<span class="bg-tertiary-container/40 text-tertiary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Epic</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Fire, Water, Lightning &amp; Nether Void</span>
+</div>
+<div class="flex items-center text-secondary-fixed font-label-md text-label-md font-bold">
+<span class="material-symbols-outlined text-secondary text-[16px] mr-1" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>2,500</span>
+</div>
+</div>
+<!-- 4 Spheres preview -->
+<div class="flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Fire -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffedd5 0%, #ea580c 45%, #9a3412 80%, #431407 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[17px] text-white">local_fire_department</span>
+</div>
+<!-- Water -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #cffafe 0%, #06b6d4 45%, #0e7490 80%, #164e63 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[17px] text-white">water_drop</span>
+</div>
+<!-- Lightning -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fef9c3 0%, #eab308 45%, #854d0e 80%, #422006 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[17px] text-white">flash_on</span>
+</div>
+<!-- Void -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #e9d5ff 0%, #9333ea 45%, #581c87 80%, #3b0764 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[17px] text-white">all_inclusive</span>
+</div>
+</div>
+<!-- Action Button (Amber Gold with insufficient balance warning tone or close match) -->
+<button class="w-full h-12 rounded-full font-label-lg text-label-lg bg-secondary-container text-on-secondary-container shadow-[0_4px_0_#b45309,inset_0_1px_1px_rgba(255,255,255,0.4)] active:translate-y-1 active:shadow-[0_1px_0_#b45309] transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>UNLOCK FOR 2,500</span>
+</button>
+</div>
+<!-- 5. Galactic Planets (Locked at Level 50) -->
+<div class="w-full bg-surface-container/70 rounded-DEFAULT p-space-md shadow-md relative overflow-hidden opacity-90">
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface/80 font-bold">Galactic Planets</span>
+<span class="bg-tertiary-container/40 text-tertiary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold">Epic</span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Earth, Mars, Jupiter &amp; Neptune</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-outline">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+</div>
+</div>
+<!-- 4 Spheres preview with subtle grayscale or lock overlay -->
+<div class="relative flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Earth -->
+<div class="w-11 h-11 rounded-full relative shadow-sm flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #93c5fd 0%, #1d4ed8 50%, #0f172a 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">public</span>
+</div>
+<!-- Mars -->
+<div class="w-11 h-11 rounded-full relative shadow-sm flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fca5a5 0%, #b91c1c 50%, #450a0a 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">circle</span>
+</div>
+<!-- Jupiter -->
+<div class="w-11 h-11 rounded-full relative shadow-sm flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fed7aa 0%, #c2410c 50%, #431407 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">grain</span>
+</div>
+<!-- Neptune -->
+<div class="w-11 h-11 rounded-full relative shadow-sm flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #a5f3fc 0%, #0891b2 50%, #164e63 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/50"></div>
+<span class="material-symbols-outlined text-[16px] text-white/80">cyclone</span>
+</div>
+</div>
+<!-- Locked Level Progress Indicator -->
+<div class="flex items-center justify-between mb-2 px-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant font-bold">Unlocks at Level 50</span>
+<span class="font-label-sm text-label-sm text-tertiary font-bold">LV.42 / 50</span>
+</div>
+<div class="w-full bg-surface-container-highest h-2 rounded-full overflow-hidden mb-space-sm">
+<div class="bg-tertiary h-full rounded-full" style="width: 84%;"></div>
+</div>
+<button class="w-full h-11 rounded-full font-label-md text-label-md bg-surface-container-highest text-outline flex items-center justify-center gap-1.5 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[18px]">lock</span>
+<span>LOCKED (Reach LV.50)</span>
+</button>
+</div>
+<!-- 6. Candy Bonbon (VIP / Premium) -->
+<div class="w-full bg-gradient-to-br from-surface-container via-surface-container to-surface-container-high rounded-DEFAULT p-space-md shadow-lg relative overflow-hidden">
+<!-- Glow ambient corner accent -->
+<div class="absolute -top-10 -right-10 w-28 h-28 bg-secondary/20 rounded-full blur-xl pointer-events-none"></div>
+<div class="flex items-start justify-between gap-space-sm mb-space-sm">
+<div>
+<div class="flex items-center gap-space-xs mb-0.5">
+<span class="font-headline-sm text-headline-sm text-on-surface font-bold">Candy Bonbon</span>
+<span class="bg-secondary-fixed text-on-secondary-fixed font-label-sm text-label-sm px-2 py-0.5 rounded-full font-bold flex items-center gap-0.5 shadow-sm">
+<span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span>
+              VIP PASS
+            </span>
+</div>
+<span class="font-body-md text-body-md text-on-surface-variant">Swirl peppermint, chocolate truffles &amp; gumdrops</span>
+</div>
+<span class="material-symbols-outlined text-secondary text-[24px]" style="font-variation-settings: 'FILL' 1;">crown</span>
+</div>
+<!-- 4 Spheres preview -->
+<div class="flex items-center justify-between bg-surface-container-lowest/60 p-space-sm rounded-DEFAULT mb-space-md">
+<!-- Peppermint Swirl -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f43f5e 50%, #9f1239 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/80"></div>
+<span class="material-symbols-outlined text-[16px] text-white">donut_small</span>
+</div>
+<!-- Chocolate Truffle -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #d7aefb 0%, #6b21a8 50%, #3b0764 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[16px] text-white">cookie</span>
+</div>
+<!-- Gumdrop Lime -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #bef264 0%, #65a30d 50%, #365314 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[16px] text-white">star</span>
+</div>
+<!-- Honey Drop -->
+<div class="w-11 h-11 rounded-full relative shadow-[0_4px_8px_rgba(0,0,0,0.4)] flex items-center justify-center" style="background: radial-gradient(circle at 35% 30%, #fef08a 0%, #f59e0b 50%, #78350f 100%);">
+<div class="w-2.5 h-2.5 rounded-full absolute top-1 left-1.5 bg-white/70"></div>
+<span class="material-symbols-outlined text-[16px] text-white">egg</span>
+</div>
+</div>
+<!-- Action Button (VIP Gold Extrusion) -->
+<button class="w-full h-12 rounded-full font-label-lg text-label-lg bg-secondary text-on-secondary shadow-[0_4px_0_#653e00,inset_0_1px_1px_rgba(255,255,255,0.4)] active:translate-y-1 active:shadow-[0_1px_0_#653e00] transition-all flex items-center justify-center gap-1.5">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span>GET WITH VIP PASS</span>
+</button>
+</div>
+</div>
+<!-- Micro-delight footer badge -->
+<div class="flex items-center justify-center gap-2 mt-space-lg text-on-surface-variant font-body-md text-body-md text-center">
+<span class="material-symbols-outlined text-primary text-[18px]">verified</span>
+<span>Cosmetic themes do not alter puzzle physics or logic.</span>
+</div>
+</div>
+<script>
+  // Playful spring interaction on Hero Tube Preview
+  const tapBtn = document.getElementById('tap-tube-btn');
+  const orb = document.getElementById('elevated-orb');
+  
+  if (tapBtn && orb) {
+    tapBtn.addEventListener('click', () => {
+      orb.classList.remove('-translate-y-1');
+      orb.classList.add('-translate-y-6', 'scale-110');
+      
+      setTimeout(() => {
+        orb.classList.remove('-translate-y-6', 'scale-110');
+        orb.classList.add('translate-y-2');
+        setTimeout(() => {
+          orb.classList.remove('translate-y-2');
+          orb.classList.add('-translate-y-1');
+        }, 150);
+      }, 200);
+    });
+  }
+</script></main><div class="fixed bottom-0 w-full z-50 pointer-events-none pb-safe px-margin mb-space-sm"><nav class="pointer-events-auto mx-auto max-w-md bg-surface-container-low/90 backdrop-blur-xl rounded-full p-1.5 shadow-[0_12px_32px_rgba(0,0,0,0.55)] flex items-center justify-around" data-active-classes="text-on-primary-container bg-primary-container shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] scale-105"><a class="flex flex-col items-center justify-center min-w-[56px] h-12 px-space-sm rounded-full text-on-surface-variant hover:text-on-surface transition-all duration-200" data-path="play" href="#"><span class="material-symbols-outlined text-[22px]">sports_esports</span><span class="font-label-sm text-label-sm font-bold tracking-tight">Play</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 px-space-sm rounded-full text-on-surface-variant hover:text-on-surface transition-all duration-200" data-path="levels" href="#"><span class="material-symbols-outlined text-[22px]">map</span><span class="font-label-sm text-label-sm font-bold tracking-tight">Levels</span></a><a aria-current="page" class="flex flex-col items-center justify-center min-w-[56px] h-12 px-space-sm rounded-full transition-all duration-200 text-on-primary-container bg-primary-container shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)] scale-105" data-path="shop" href="#"><span class="material-symbols-outlined text-[22px]">shopping_bag</span><span class="font-label-sm text-label-sm font-bold tracking-tight">Shop</span></a><a class="flex flex-col items-center justify-center min-w-[56px] h-12 px-space-sm rounded-full text-on-surface-variant hover:text-on-surface transition-all duration-200" data-path="events" href="#"><span class="material-symbols-outlined text-[22px]">emoji_events</span><span class="font-label-sm text-label-sm font-bold tracking-tight">Events</span></a></nav></div></body></html>
