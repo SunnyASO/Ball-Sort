@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_theme.dart';
+import '../theme/game_theme.dart';
 
-/// Top HUD and booster action toolbar matching the Stitch gameplay design.
+/// Top HUD and booster action toolbar matching the Orb Lab futuristic laboratory aesthetic.
 class GameHeader extends StatelessWidget {
   final int levelNumber;
   final int moveCount;
@@ -26,14 +26,20 @@ class GameHeader extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // 1. Top App Bar (Icon, Title, Hearts, Coins, Level, Settings, Avatar)
+        // 1. Top App Bar (Icon, Title: Ball Sort / ORB LAB, Level, Status capsule)
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
           decoration: BoxDecoration(
-            color: AppTheme.surface.withAlpha(220),
+            color: GameTheme.surface.withAlpha(240),
+            border: const Border(
+              bottom: BorderSide(
+                color: Color(0x3349DCEC), // subtle cyan horizontal divider
+                width: 1.0,
+              ),
+            ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withAlpha(80),
+                color: Colors.black.withAlpha(120),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -42,97 +48,64 @@ class GameHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Logo & Title
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const RadialGradient(
-                        colors: [AppTheme.primary, AppTheme.primaryContainer],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppTheme.primary.withAlpha(100),
-                          blurRadius: 8,
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.bubble_chart,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        'Ball Sort',
-                        style: TextStyle(
-                          color: AppTheme.onSurface,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.3,
-                        ),
-                      ),
-                      Text(
-                        'Play',
-                        style: TextStyle(
-                          color: AppTheme.primary,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-
-              // Status Capsules (Coins, Level)
+              // Logo & Title: Ball Sort / ORB LAB
               Flexible(
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 3,
-                      ),
+                      width: 28,
+                      height: 28,
                       decoration: BoxDecoration(
-                        color: AppTheme.surfaceContainerHigh.withAlpha(220),
-                        borderRadius: BorderRadius.circular(12),
+                        shape: BoxShape.circle,
+                        gradient: const RadialGradient(
+                          colors: [
+                            GameTheme.cyanGlow,
+                            GameTheme.cyanAccent,
+                            GameTheme.blueAccent,
+                          ],
+                          stops: [0.0, 0.45, 1.0],
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: GameTheme.cyanAccent.withAlpha(140),
+                            blurRadius: 8,
+                          ),
+                        ],
                       ),
-                      child: Row(
+                      child: const Icon(
+                        Icons.science_outlined,
+                        color: GameTheme.background,
+                        size: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.monetization_on,
-                            color: AppTheme.secondary,
-                            size: 11,
-                          ),
-                          const SizedBox(width: 2),
-                          const Text(
-                            '2.4k',
-                            style: TextStyle(
-                              color: AppTheme.secondaryFixed,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
+                        children: const [
                           Text(
-                            'L$levelNumber',
-                            style: const TextStyle(
-                              color: AppTheme.tertiary,
-                              fontSize: 10,
+                            'Ball Sort',
+                            style: TextStyle(
+                              color: GameTheme.textPrimary,
+                              fontSize: 13,
                               fontWeight: FontWeight.bold,
+                              letterSpacing: 0.3,
                             ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            'ORB LAB',
+                            style: TextStyle(
+                              color: GameTheme.cyanAccent,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ],
                       ),
@@ -141,18 +114,38 @@ class GameHeader extends StatelessWidget {
                 ),
               ),
 
-              // Avatar
+              const SizedBox(width: 6),
+
+              // Lab Status Capsule (Sector / Chamber Code)
               Container(
-                width: 26,
-                height: 26,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppTheme.primary,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: GameTheme.surfaceElevated,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: GameTheme.cyanAccent.withAlpha(60),
+                    width: 1,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.person,
-                  color: AppTheme.onPrimary,
-                  size: 16,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.bolt,
+                      color: GameTheme.cyanAccent,
+                      size: 12,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      'SEC $levelNumber',
+                      style: const TextStyle(
+                        color: GameTheme.cyanAccent,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.6,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -161,20 +154,24 @@ class GameHeader extends StatelessWidget {
 
         const SizedBox(height: 6),
 
-        // 2. In-Game Sub-HUD: Level badge, 3-Star target bar, and Moves count
+        // 2. In-Game Sub-HUD: Level badge and Moves count
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 10.0,
               vertical: 6.0,
             ),
             decoration: BoxDecoration(
-              color: AppTheme.surfaceContainerHigh.withAlpha(200),
-              borderRadius: BorderRadius.circular(20.0),
+              color: GameTheme.surfaceElevated.withAlpha(220),
+              borderRadius: BorderRadius.circular(16.0),
+              border: Border.all(
+                color: GameTheme.cyanAccent.withAlpha(40),
+                width: 1,
+              ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withAlpha(80),
+                  color: Colors.black.withAlpha(90),
                   blurRadius: 10,
                   offset: const Offset(0, 3),
                 ),
@@ -184,47 +181,41 @@ class GameHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Level Indicator (Preserves text: "Level $levelNumber" for tests)
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppTheme.primaryContainer,
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: GameTheme.cyanAccent.withAlpha(35),
+                        ),
+                        child: const Icon(
+                          Icons.track_changes,
+                          color: GameTheme.cyanAccent,
+                          size: 14,
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.military_tech,
-                        color: AppTheme.primary,
-                        size: 14,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
                           'Level $levelNumber',
                           style: const TextStyle(
-                            color: AppTheme.onSurface,
+                            color: GameTheme.textPrimary,
                             fontSize: 13,
                             fontWeight: FontWeight.bold,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const Text(
-                          'Standard',
-                          style: TextStyle(
-                            color: AppTheme.onSurfaceVariant,
-                            fontSize: 9,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                      ),
+                    ],
+                  ),
                 ),
+
+                const SizedBox(width: 6),
 
                 // Moves badge (Preserves text: "Moves: $moveCount" for tests)
                 Container(
@@ -233,24 +224,29 @@ class GameHeader extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLowest.withAlpha(200),
+                    color: GameTheme.background.withAlpha(220),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: GameTheme.blueAccent.withAlpha(80),
+                      width: 1,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Icons.touch_app,
-                        color: AppTheme.tertiary,
+                        Icons.swap_calls_rounded,
+                        color: GameTheme.cyanAccent,
                         size: 12,
                       ),
                       const SizedBox(width: 3),
                       Text(
                         'Moves: $moveCount',
                         style: const TextStyle(
-                          color: AppTheme.onSurface,
+                          color: GameTheme.cyanAccent,
                           fontSize: 11,
                           fontWeight: FontWeight.bold,
+                          letterSpacing: 0.3,
                         ),
                       ),
                     ],
@@ -265,19 +261,20 @@ class GameHeader extends StatelessWidget {
   }
 }
 
-/// Booster Action Toolbar matching Stitch Screen 2.
+/// Bottom booster action toolbar styled for the Orb Lab control station.
+/// Prominently features Undo and Restart with clear active/disabled visual feedback.
 class BoosterToolbar extends StatelessWidget {
-  final VoidCallback? onUndo;
   final VoidCallback onRestart;
+  final VoidCallback? onUndo;
   final bool canUndo;
   final bool canRestart;
 
   const BoosterToolbar({
     super.key,
-    required this.onUndo,
     required this.onRestart,
-    required this.canUndo,
-    required this.canRestart,
+    this.onUndo,
+    this.canUndo = false,
+    this.canRestart = true,
   });
 
   @override
@@ -285,85 +282,84 @@ class BoosterToolbar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Container(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceContainerHigh.withAlpha(220),
-          borderRadius: BorderRadius.circular(20.0),
+          color: GameTheme.surface.withAlpha(230),
+          borderRadius: BorderRadius.circular(22.0),
+          border: Border.all(
+            color: GameTheme.cyanAccent.withAlpha(35),
+            width: 1,
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(110),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
+              color: Colors.black.withAlpha(100),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
             ),
           ],
         ),
         child: Row(
           children: [
-            // 1. Undo Booster
+            // 1. Undo Control (Prominent laboratory action button)
             Expanded(
-              child: _BoosterButton(
+              child: _LabActionButton(
                 key: const Key('undo_button'),
-                icon: Icons.undo,
+                icon: Icons.undo_rounded,
                 label: 'Undo',
-                badgeText: '3',
-                badgeColor: AppTheme.secondary,
-                iconColor: AppTheme.primary,
+                iconColor: GameTheme.cyanAccent,
                 isEnabled: canUndo,
                 onTap: canUndo ? onUndo : null,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
 
-            // 2. Restart Booster
+            // 2. Restart Control (Prominent laboratory reset button)
             Expanded(
-              child: _BoosterButton(
+              child: _LabActionButton(
                 key: const Key('restart_button'),
-                icon: Icons.replay,
+                icon: Icons.refresh_rounded,
                 label: 'Restart',
-                iconColor: AppTheme.onSurface,
+                iconColor: GameTheme.violetAccent,
                 isEnabled: canRestart,
                 onTap: canRestart ? onRestart : null,
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
 
-            // 3. +1 Tube Booster
+            // 3. Technical Protocol Marker / Chamber Stabilizer
             Expanded(
-              child: _BoosterButton(
+              child: _LabActionButton(
                 key: const Key('add_tube_button'),
-                icon: Icons.add_circle,
-                label: '+1 Tube',
-                badgeText: '500',
-                badgeIcon: Icons.monetization_on,
-                badgeColor: AppTheme.secondaryContainer,
-                iconColor: AppTheme.secondary,
+                icon: Icons.add_circle_outline_rounded,
+                label: '+1 Chamber',
+                iconColor: GameTheme.textTertiary,
                 isEnabled: true,
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Extra Tube Booster unlocked!'),
+                      content: Text('Auxiliary chamber unlocked!'),
                       duration: Duration(seconds: 1),
                     ),
                   );
                 },
               ),
             ),
-            const SizedBox(width: 6),
+            const SizedBox(width: 8),
 
-            // 4. Hint Booster
+            // 4. Lab Calibration / Guide Action
             Expanded(
-              child: _BoosterButton(
+              child: _LabActionButton(
                 key: const Key('hint_button'),
-                icon: Icons.auto_fix_high,
-                label: 'Hint',
-                badgeText: '2',
-                badgeColor: AppTheme.tertiary,
-                iconColor: AppTheme.tertiary,
+                icon: Icons.psychology_outlined,
+                label: 'Calibrate',
+                iconColor: GameTheme.blueAccent,
                 isEnabled: true,
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text('Hint: Look for matching colors!'),
+                      content: Text(
+                        'Calibration: Align energy orbs by chromatic frequency!',
+                      ),
                       duration: Duration(seconds: 1),
                     ),
                   );
@@ -377,23 +373,17 @@ class BoosterToolbar extends StatelessWidget {
   }
 }
 
-class _BoosterButton extends StatelessWidget {
+class _LabActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
-  final String? badgeText;
-  final IconData? badgeIcon;
-  final Color? badgeColor;
   final Color iconColor;
   final bool isEnabled;
   final VoidCallback? onTap;
 
-  const _BoosterButton({
+  const _LabActionButton({
     super.key,
     required this.icon,
     required this.label,
-    this.badgeText,
-    this.badgeIcon,
-    this.badgeColor,
     required this.iconColor,
     required this.isEnabled,
     this.onTap,
@@ -401,85 +391,50 @@ class _BoosterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final activeColor = iconColor;
+    final disabledColor = GameTheme.textDisabled;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16.0),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceContainer.withAlpha(isEnabled ? 200 : 80),
+          color: GameTheme.surfaceElevated.withAlpha(isEnabled ? 220 : 70),
           borderRadius: BorderRadius.circular(16.0),
+          border: Border.all(
+            color: isEnabled ? activeColor.withAlpha(60) : Colors.transparent,
+            width: 1,
+          ),
         ),
-        child: Stack(
-          clipBehavior: Clip.none,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: iconColor.withAlpha(isEnabled ? 35 : 15),
-                  ),
-                  child: Icon(
-                    icon,
-                    color: isEnabled ? iconColor : AppTheme.outlineVariant,
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  label,
-                  style: TextStyle(
-                    color: isEnabled
-                        ? AppTheme.onSurface
-                        : AppTheme.outlineVariant,
-                    fontSize: 11,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            if (badgeText != null)
-              Positioned(
-                top: -6,
-                right: -2,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 1.5,
-                  ),
-                  decoration: BoxDecoration(
-                    color: badgeColor ?? AppTheme.secondary,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(90),
-                        blurRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (badgeIcon != null) ...[
-                        Icon(badgeIcon, color: Colors.white, size: 9),
-                        const SizedBox(width: 1),
-                      ],
-                      Text(
-                        badgeText!,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 9,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isEnabled
+                    ? activeColor.withAlpha(30)
+                    : GameTheme.surfaceDim,
               ),
+              child: Icon(
+                icon,
+                color: isEnabled ? activeColor : disabledColor,
+                size: 19,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: isEnabled ? GameTheme.textPrimary : disabledColor,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.3,
+              ),
+            ),
           ],
         ),
       ),

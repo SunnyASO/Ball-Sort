@@ -294,28 +294,40 @@ class _GameScreenState extends State<GameScreen>
       body: SafeArea(
         child: Stack(
           children: [
-            // Ambient Cosmic Background Glows
+            // Ambient Orb Lab Background Atmosphere Glows
             Positioned(
-              top: 40,
-              left: 20,
+              top: 20,
+              left: -30,
+              child: Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF49DCEC).withAlpha(16),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 180,
+              right: -40,
               child: Container(
                 width: 220,
                 height: 220,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.primaryContainer.withAlpha(25),
+                  color: const Color(0xFFA178FF).withAlpha(14),
                 ),
               ),
             ),
             Positioned(
-              bottom: 120,
-              right: 20,
+              bottom: 100,
+              left: 40,
               child: Container(
-                width: 200,
-                height: 200,
+                width: 260,
+                height: 260,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.tertiaryContainer.withAlpha(30),
+                  color: const Color(0xFF5A8DFF).withAlpha(16),
                 ),
               ),
             ),
@@ -335,37 +347,42 @@ class _GameScreenState extends State<GameScreen>
 
                 const SizedBox(height: 8),
 
-                // Interactive Hint Pill
+                // Interactive Containment Protocol Hint Pill
                 Container(
                   constraints: BoxConstraints(
                     maxWidth: MediaQuery.sizeOf(context).width - 32,
                   ),
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 10.0,
-                    vertical: 4.0,
+                    horizontal: 12.0,
+                    vertical: 4.5,
                   ),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceContainerLow.withAlpha(220),
+                    color: const Color(0xFF121D38).withAlpha(220),
                     borderRadius: BorderRadius.circular(16.0),
+                    border: Border.all(
+                      color: const Color(0xFF49DCEC).withAlpha(45),
+                      width: 1.0,
+                    ),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(
-                        Icons.lightbulb,
-                        color: AppTheme.secondary,
+                        Icons.track_changes_outlined,
+                        color: Color(0xFF49DCEC),
                         size: 13,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: 5),
                       Flexible(
                         child: Text(
                           _controller.selectedTubeIndex != null
-                              ? 'Tap destination tube'
-                              : 'Tap tube to select top ball',
+                              ? 'Select target containment chamber'
+                              : 'Select chamber to transfer energy orb',
                           style: const TextStyle(
-                            color: AppTheme.onSurfaceVariant,
+                            color: Color(0xFF9DADCA),
                             fontSize: 11,
-                            fontWeight: FontWeight.w500,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.2,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
@@ -494,18 +511,30 @@ class _GameScreenState extends State<GameScreen>
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  // Wooden/Velvet Stand Platform
+                                  // Orb Lab Containment Docking Deck Platform
                                   Container(
                                     width: math.min(
                                       availableWidth - 32,
                                       (board.tubeCount *
                                           (computedBallSize + 22.0)),
                                     ),
-                                    height: 6,
+                                    height: 8,
                                     decoration: BoxDecoration(
-                                      color: AppTheme.surfaceContainerHighest
-                                          .withAlpha(160),
+                                      color: const Color(0xFF1B2A4B),
                                       borderRadius: BorderRadius.circular(4),
+                                      border: Border.all(
+                                        color: const Color(0xFF49DCEC)
+                                            .withAlpha(60),
+                                        width: 1,
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: const Color(0xFF49DCEC)
+                                              .withAlpha(35),
+                                          blurRadius: 10,
+                                          spreadRadius: 1,
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],

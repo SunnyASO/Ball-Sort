@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
 
 import '../game/tube.dart';
-import '../theme/app_theme.dart';
+import '../theme/game_theme.dart';
 import 'ball_widget.dart';
 
-/// Translucent glass tube presentation widget styled after the Stitch design system.
+/// Futuristic containment chamber widget styled after the Orb Lab aesthetic.
 ///
 /// Features:
-/// - Open top with glowing frosted glass rim lip.
-/// - Rounded base with glass specular highlights and inner reflections.
-/// - Clear drop cue and target highlighting for empty/target vessels.
-/// - Smooth pulse/glow effect when selected as active source.
+/// - Dark, translucent cyan-tinted energy cylinder vessel.
+/// - Illuminated containment rim lip at the open top with energetic glow.
+/// - Mechanical base socket support with futuristic bevelled feet.
+/// - Vertical optical laser-guide markings and specular edge highlights.
+/// - Active selection glow with energetic cyan outline.
+/// - Drop target cue with sapphire blue guide beacon.
+/// - Clear, high-contrast FREE chamber indicator for empty vessels.
+/// - Preserves all existing testing keys, geometry contracts, and multi-ball destination slot hiding.
 class TubeWidget extends StatelessWidget {
   final Tube tube;
   final bool isSelected;
@@ -63,29 +67,34 @@ class TubeWidget extends StatelessWidget {
         (tube.capacity * ballSize) + ((tube.capacity + 1) * 6.0) + 16.0;
 
     final borderColor = isSelected
-        ? AppTheme.secondary
-        : (isDropTarget ? AppTheme.tertiary : Colors.white.withAlpha(45));
+        ? GameTheme.chamberSelectedBorder
+        : (isDropTarget
+              ? GameTheme.chamberDropTargetBorder
+              : GameTheme.chamberBorder);
 
     final rimGlowColor = isSelected
-        ? AppTheme.secondary.withAlpha(150)
+        ? GameTheme.cyanAccent
         : (isDropTarget
-              ? AppTheme.tertiary.withAlpha(160)
-              : Colors.white.withAlpha(30));
+              ? GameTheme.blueAccent.withAlpha(200)
+              : GameTheme.chamberRimGlow);
 
     return Semantics(
       button: true,
       selected: isSelected,
-      label: 'Tube with ${tube.balls.length} of ${tube.capacity} balls',
+      label:
+          'Containment Chamber with ${tube.balls.length} of ${tube.capacity} energy orbs',
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
         child: SizedBox(
           width: tubeWidth,
-          height: tubeHeight + 8.0, // extra height for open rim lip
+          height:
+              tubeHeight +
+              10.0, // extra height for open rim lip and mechanical base
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              // 1. Glowing Rim Lip at the open top
+              // 1. Energetic Rim Lip at the open top of the chamber
               Positioned(
                 top: 0,
                 left: 1,
@@ -96,39 +105,39 @@ class TubeWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     gradient: LinearGradient(
                       colors: [
-                        Colors.white.withAlpha(100),
+                        Colors.white.withAlpha(140),
                         rimGlowColor,
-                        Colors.white.withAlpha(70),
+                        Colors.white.withAlpha(90),
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: rimGlowColor,
-                        blurRadius: isSelected || isDropTarget ? 12 : 4,
-                        spreadRadius: isSelected ? 1 : 0,
+                        color: rimGlowColor.withAlpha(isSelected ? 220 : 100),
+                        blurRadius: isSelected || isDropTarget ? 14 : 5,
+                        spreadRadius: isSelected ? 1.5 : 0,
                       ),
                     ],
                   ),
                 ),
               ),
 
-              // 2. Translucent Glass Cylinder Vessel
+              // 2. Translucent Energy Containment Cylinder Vessel
               Positioned(
                 top: 5,
                 left: 0,
                 right: 0,
-                bottom: 0,
+                bottom: 4,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: isSelected
-                        ? AppTheme.primaryContainer.withAlpha(40)
+                        ? GameTheme.cyanAccent.withAlpha(35)
                         : (isDropTarget
-                              ? AppTheme.tertiary.withAlpha(20)
-                              : Colors.white.withAlpha(14)),
+                              ? GameTheme.blueAccent.withAlpha(25)
+                              : GameTheme.chamberGlass),
                     borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(32.0),
-                      bottomRight: Radius.circular(32.0),
+                      bottomLeft: Radius.circular(28.0),
+                      bottomRight: Radius.circular(28.0),
                       topLeft: Radius.circular(4.0),
                       topRight: Radius.circular(4.0),
                     ),
@@ -149,19 +158,19 @@ class TubeWidget extends StatelessWidget {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withAlpha(130),
+                        color: Colors.black.withAlpha(160),
                         blurRadius: 18,
                         offset: const Offset(0, 10),
                       ),
                       if (isSelected)
                         BoxShadow(
-                          color: AppTheme.secondary.withAlpha(80),
-                          blurRadius: 16,
+                          color: GameTheme.cyanAccent.withAlpha(110),
+                          blurRadius: 18,
                           spreadRadius: 2,
                         ),
                       if (isDropTarget)
                         BoxShadow(
-                          color: AppTheme.tertiary.withAlpha(90),
+                          color: GameTheme.blueAccent.withAlpha(110),
                           blurRadius: 14,
                           spreadRadius: 1,
                         ),
@@ -175,12 +184,32 @@ class TubeWidget extends StatelessWidget {
                   ),
                   child: Stack(
                     children: [
-                      // Glass specular highlight streak (left edge)
+                      // Technical Measurement / Laser Alignment Marks (Right inner edge)
+                      Positioned(
+                        right: 3,
+                        top: 12,
+                        bottom: 24,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: List.generate(
+                            tube.capacity,
+                            (index) => Container(
+                              width: 3.5,
+                              height: 1.5,
+                              color: isSelected
+                                  ? GameTheme.cyanAccent.withAlpha(150)
+                                  : GameTheme.chamberBorder.withAlpha(120),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // Specular Glass Reflection Streak (Left inner edge)
                       Positioned(
                         left: 2,
                         top: 6,
                         bottom: 16,
-                        width: 2.5,
+                        width: 2.0,
                         child: Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(2),
@@ -188,8 +217,8 @@ class TubeWidget extends StatelessWidget {
                               begin: Alignment.topCenter,
                               end: Alignment.bottomCenter,
                               colors: [
-                                Colors.white.withAlpha(90),
-                                Colors.white.withAlpha(20),
+                                Colors.white.withAlpha(100),
+                                Colors.white.withAlpha(25),
                                 Colors.transparent,
                               ],
                             ),
@@ -197,19 +226,19 @@ class TubeWidget extends StatelessWidget {
                         ),
                       ),
 
-                      // Empty tube drop cue indicator
+                      // Empty Containment Vessel Drop Beacon Indicator
                       if (tube.isEmpty)
                         Center(
                           child: Opacity(
-                            opacity: isDropTarget ? 0.9 : 0.35,
+                            opacity: isDropTarget ? 0.95 : 0.40,
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
                                   Icons.arrow_downward_rounded,
                                   color: isDropTarget
-                                      ? AppTheme.tertiary
-                                      : AppTheme.onSurfaceVariant,
+                                      ? GameTheme.cyanAccent
+                                      : GameTheme.textSecondary,
                                   size: 20,
                                 ),
                                 const SizedBox(height: 2),
@@ -217,11 +246,11 @@ class TubeWidget extends StatelessWidget {
                                   'FREE',
                                   style: TextStyle(
                                     color: isDropTarget
-                                        ? AppTheme.tertiary
-                                        : AppTheme.onSurfaceVariant,
+                                        ? GameTheme.cyanAccent
+                                        : GameTheme.textSecondary,
                                     fontSize: 10,
                                     fontWeight: FontWeight.bold,
-                                    letterSpacing: 0.8,
+                                    letterSpacing: 1.2,
                                   ),
                                 ),
                               ],
@@ -229,7 +258,7 @@ class TubeWidget extends StatelessWidget {
                           ),
                         ),
 
-                      // Ball stack (index 0 at bottom)
+                      // Energy Orb Stack (index 0 at bottom)
                       Align(
                         alignment: Alignment.bottomCenter,
                         child: Column(
@@ -252,6 +281,33 @@ class TubeWidget extends StatelessWidget {
                               ),
                           ],
                         ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              // 3. Futuristic Mechanical Base Socket Platform
+              Positioned(
+                bottom: 0,
+                left: 3,
+                right: 3,
+                height: 5,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: GameTheme.surfaceElevated,
+                    borderRadius: BorderRadius.circular(3),
+                    border: Border.all(
+                      color: isSelected
+                          ? GameTheme.cyanAccent.withAlpha(180)
+                          : GameTheme.surfaceHighlight,
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(120),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
