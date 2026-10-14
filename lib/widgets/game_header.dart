@@ -266,15 +266,23 @@ class GameHeader extends StatelessWidget {
 class BoosterToolbar extends StatelessWidget {
   final VoidCallback onRestart;
   final VoidCallback? onUndo;
+  final VoidCallback? onAddTube;
+  final VoidCallback? onHint;
   final bool canUndo;
   final bool canRestart;
+  final bool canAddTube;
+  final bool canHint;
 
   const BoosterToolbar({
     super.key,
     required this.onRestart,
     this.onUndo,
+    this.onAddTube,
+    this.onHint,
     this.canUndo = false,
     this.canRestart = true,
+    this.canAddTube = true,
+    this.canHint = true,
   });
 
   @override
@@ -333,15 +341,8 @@ class BoosterToolbar extends StatelessWidget {
                 icon: Icons.add_circle_outline_rounded,
                 label: '+1 Chamber',
                 iconColor: GameTheme.textTertiary,
-                isEnabled: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Auxiliary chamber unlocked!'),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                },
+                isEnabled: canAddTube,
+                onTap: canAddTube ? onAddTube : null,
               ),
             ),
             const SizedBox(width: 8),
@@ -351,19 +352,10 @@ class BoosterToolbar extends StatelessWidget {
               child: _LabActionButton(
                 key: const Key('hint_button'),
                 icon: Icons.psychology_outlined,
-                label: 'Calibrate',
-                iconColor: GameTheme.blueAccent,
-                isEnabled: true,
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Calibration: Align energy orbs by chromatic frequency!',
-                      ),
-                      duration: Duration(seconds: 1),
-                    ),
-                  );
-                },
+                label: 'Hint',
+                iconColor: const Color(0xFFFFD700),
+                isEnabled: canHint,
+                onTap: canHint ? onHint : null,
               ),
             ),
           ],

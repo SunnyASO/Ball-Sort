@@ -1,5 +1,6 @@
 import 'ball_move.dart';
 import 'ball_sort_board.dart';
+import 'board_solver.dart';
 import 'move_validator.dart';
 import 'tube.dart';
 
@@ -9,6 +10,7 @@ import 'tube.dart';
 class GameController {
   final BallSortBoard initialBoard;
   final MoveValidator validator;
+  final BoardSolver solver;
 
   BallSortBoard _board;
   int? _selectedTubeIndex;
@@ -19,6 +21,7 @@ class GameController {
   GameController({
     required this.initialBoard,
     this.validator = const MoveValidator(),
+    this.solver = const BoardSolver(),
   }) : _board = initialBoard,
        _selectedTubeIndex = null,
        _moveCount = 0,
@@ -49,6 +52,16 @@ class GameController {
   /// Allows locking or unlocking input externally (e.g. for animations).
   void setInputLocked(bool locked) {
     _inputLocked = locked;
+  }
+
+  /// Calculates the next optimal move towards solving the current board.
+  /// Returns `null` if the input is locked, the board is already solved,
+  /// or no solution is reachable.
+  BallMove? getHint() {
+    if (_inputLocked || solved) {
+      return null;
+    }
+    return solver.getNextOptimalMove(_board);
   }
 
   /// Handles player tapping a tube at [tubeIndex].
@@ -189,5 +202,18 @@ class GameController {
     _moveCount = 0;
     _moveHistory.clear();
     _inputLocked = false;
+  }
+
+  /// Adds a new empty helper containment chamber to the board if under maximum limit (8).
+  /// Returns `true` if added successfully.
+  bool addEmptyTube({int capacity = 4}) {
+    if (_inputLocked || solved || _board.tubeCount >= 8) {
+      return false;
+    }
+    final newTubes = List<Tube>.from(_board.tubes)
+      ..add(Tube(capacity: capacity));
+    _board = BallSortBoard(newTubes);
+    _selectedTubeIndex = null;
+    return true;
   }
 }

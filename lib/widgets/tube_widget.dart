@@ -23,6 +23,7 @@ class TubeWidget extends StatelessWidget {
   final Set<int>? hiddenBallSlots;
   final int? hiddenBallSlot;
   final bool isDropTarget;
+  final bool isHinted;
 
   const TubeWidget({
     super.key,
@@ -33,6 +34,7 @@ class TubeWidget extends StatelessWidget {
     this.hiddenBallSlot,
     this.hiddenBallSlots,
     this.isDropTarget = false,
+    this.isHinted = false,
   });
 
   /// Whether slot [index] is currently hidden for animation.
@@ -68,15 +70,17 @@ class TubeWidget extends StatelessWidget {
 
     final borderColor = isSelected
         ? GameTheme.chamberSelectedBorder
-        : (isDropTarget
-              ? GameTheme.chamberDropTargetBorder
+        : (isHinted
+              ? const Color(0xFFFFD700)
               : GameTheme.chamberBorder);
 
     final rimGlowColor = isSelected
         ? GameTheme.cyanAccent
-        : (isDropTarget
-              ? GameTheme.blueAccent.withAlpha(200)
-              : GameTheme.chamberRimGlow);
+        : (isHinted
+              ? const Color(0xFFFFD700)
+              : (isDropTarget
+                    ? GameTheme.cyanAccent.withAlpha(140)
+                    : GameTheme.chamberRimGlow));
 
     return Semantics(
       button: true,
@@ -86,96 +90,92 @@ class TubeWidget extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: SizedBox(
-          width: tubeWidth,
-          height:
-              tubeHeight +
-              10.0, // extra height for open rim lip and mechanical base
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              // 1. Energetic Rim Lip at the open top of the chamber
-              Positioned(
-                top: 0,
-                left: 1,
-                right: 1,
-                height: 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.white.withAlpha(140),
-                        rimGlowColor,
-                        Colors.white.withAlpha(90),
+        child: AnimatedSlide(
+          offset: isSelected ? const Offset(0, -0.015) : Offset.zero,
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutBack,
+          child: SizedBox(
+            width: tubeWidth,
+            height:
+                tubeHeight +
+                10.0, // extra height for open rim lip and mechanical base
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // 1. Energetic Rim Lip at the open top of the chamber
+                Positioned(
+                  top: 0,
+                  left: 1,
+                  right: 1,
+                  height: 10,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.white.withAlpha(140),
+                          rimGlowColor,
+                          Colors.white.withAlpha(90),
+                        ],
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: rimGlowColor.withAlpha(isSelected ? 220 : 100),
+                          blurRadius: isSelected || isDropTarget ? 14 : 5,
+                          spreadRadius: isSelected ? 1.5 : 0,
+                        ),
                       ],
                     ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: rimGlowColor.withAlpha(isSelected ? 220 : 100),
-                        blurRadius: isSelected || isDropTarget ? 14 : 5,
-                        spreadRadius: isSelected ? 1.5 : 0,
-                      ),
-                    ],
                   ),
                 ),
-              ),
 
-              // 2. Translucent Energy Containment Cylinder Vessel
-              Positioned(
-                top: 5,
-                left: 0,
-                right: 0,
-                bottom: 4,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? GameTheme.cyanAccent.withAlpha(35)
-                        : (isDropTarget
-                              ? GameTheme.blueAccent.withAlpha(25)
-                              : GameTheme.chamberGlass),
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(28.0),
-                      bottomRight: Radius.circular(28.0),
-                      topLeft: Radius.circular(4.0),
-                      topRight: Radius.circular(4.0),
-                    ),
-                    border: Border(
-                      left: BorderSide(
-                        color: borderColor,
-                        width: isSelected ? 2.5 : 1.5,
+                // 2. Translucent Energy Containment Cylinder Vessel
+                Positioned(
+                  top: 5,
+                  left: 0,
+                  right: 0,
+                  bottom: 4,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 180),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? GameTheme.cyanAccent.withAlpha(35)
+                          : GameTheme.chamberGlass,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(28.0),
+                        bottomRight: Radius.circular(28.0),
+                        topLeft: Radius.circular(4.0),
+                        topRight: Radius.circular(4.0),
                       ),
-                      right: BorderSide(
-                        color: borderColor,
-                        width: isSelected ? 2.5 : 1.5,
+                      border: Border(
+                        left: BorderSide(
+                          color: borderColor,
+                          width: isSelected ? 2.5 : 1.5,
+                        ),
+                        right: BorderSide(
+                          color: borderColor,
+                          width: isSelected ? 2.5 : 1.5,
+                        ),
+                        bottom: BorderSide(
+                          color: borderColor,
+                          width: isSelected ? 2.5 : 1.5,
+                        ),
+                        top: BorderSide.none,
                       ),
-                      bottom: BorderSide(
-                        color: borderColor,
-                        width: isSelected ? 2.5 : 1.5,
-                      ),
-                      top: BorderSide.none,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withAlpha(160),
-                        blurRadius: 18,
-                        offset: const Offset(0, 10),
-                      ),
-                      if (isSelected)
+                      boxShadow: [
                         BoxShadow(
-                          color: GameTheme.cyanAccent.withAlpha(110),
+                          color: Colors.black.withAlpha(160),
                           blurRadius: 18,
-                          spreadRadius: 2,
+                          offset: const Offset(0, 10),
                         ),
-                      if (isDropTarget)
-                        BoxShadow(
-                          color: GameTheme.blueAccent.withAlpha(110),
-                          blurRadius: 14,
-                          spreadRadius: 1,
-                        ),
-                    ],
-                  ),
+                        if (isSelected)
+                          BoxShadow(
+                            color: GameTheme.cyanAccent.withAlpha(110),
+                            blurRadius: 18,
+                            spreadRadius: 2,
+                          ),
+                      ],
+                    ),
                   padding: const EdgeInsets.only(
                     bottom: 10.0,
                     left: 4.0,
@@ -274,9 +274,19 @@ class TubeWidget extends StatelessWidget {
                                         width: ballSize,
                                         height: ballSize,
                                       )
-                                    : BallWidget(
-                                        type: tube.balls[i],
-                                        size: ballSize,
+                                    : AnimatedSlide(
+                                        offset: (isSelected &&
+                                                i == tube.balls.length - 1)
+                                            ? const Offset(0, -0.28)
+                                            : Offset.zero,
+                                        duration: const Duration(
+                                          milliseconds: 180,
+                                        ),
+                                        curve: Curves.easeOutBack,
+                                        child: BallWidget(
+                                          type: tube.balls[i],
+                                          size: ballSize,
+                                        ),
                                       ),
                               ),
                           ],
@@ -317,6 +327,7 @@ class TubeWidget extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

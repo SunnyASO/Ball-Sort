@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'screens/game_screen.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+import 'services/progression_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ProgressionService.instance.initialize();
   runApp(const BallSortApp());
 }
 

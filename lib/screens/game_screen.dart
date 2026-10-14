@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 
 import '../game/ball_move.dart';
 import '../game/game_controller.dart';
+import '../levels/level_catalog.dart';
 import '../levels/prototype_levels.dart';
+import '../services/audio_haptic_service.dart';
+import '../services/progression_service.dart';
 import '../theme/app_theme.dart';
+import '../widgets/celebration_particles.dart';
 import '../widgets/game_header.dart';
 import '../widgets/move_animation_layer.dart';
 import '../widgets/tube_widget.dart';
@@ -46,6 +50,9 @@ class _GameScreenState extends State<GameScreen>
   Set<int>? _animatingDestSlots;
   double _currentBallSize = 48.0;
 
+  int? _hintSourceTube;
+  int? _hintDestTube;
+
   final GlobalKey _playAreaKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
 
@@ -67,6 +74,7 @@ class _GameScreenState extends State<GameScreen>
   void _onAnimationStatus(AnimationStatus status) {
     if (!mounted) return;
     if (status == AnimationStatus.completed) {
+      final destIndex = _animatingDestTube;
       setState(() {
         _isAnimating = false;
         _activeAnimationData = null;
@@ -74,6 +82,22 @@ class _GameScreenState extends State<GameScreen>
         _animatingDestSlots = null;
         _controller.setInputLocked(false);
       });
+
+      // Synchronize touchdown impact sensory feedback at the exact moment of landing
+      AudioHapticService.instance.playTransferDrop();
+
+      if (destIndex != null && _controller.board.tubes[destIndex].isComplete) {
+        AudioHapticService.instance.playTubeComplete();
+      }
+
+      if (_controller.solved) {
+        AudioHapticService.instance.playVictory();
+        ProgressionService.instance.recordLevelCompletion(
+          level: _currentLevelNumber,
+          moves: _controller.moveCount,
+        );
+        ProgressionService.instance.setCurrentLevel(_currentLevelNumber + 1);
+      }
     }
   }
 
@@ -132,6 +156,10 @@ class _GameScreenState extends State<GameScreen>
       return;
     }
 
+    _hintSourceTube = null;
+    _hintDestTube = null;
+    AudioHapticService.instance.playSelect();
+
     final move = _controller.handleTubeTap(index);
     if (move != null) {
       _startTransferAnimation(move);
@@ -146,6 +174,14 @@ class _GameScreenState extends State<GameScreen>
 
     final k = move.ballsMoved;
     final destTubeIndex = move.destinationTube;
+    final sourceTubeIndex = move.sourceTube;
+
+    final tubeDistance = (sourceTubeIndex - destTubeIndex).abs();
+    final adaptiveDuration = Duration(
+      milliseconds: (320 + (tubeDistance * 20)).clamp(320, 440),
+    );
+    _animationController.duration = adaptiveDuration;
+
     final destTube = _controller.board.tubes[destTubeIndex];
     final totalDestBalls = destTube.balls.length;
 
@@ -157,7 +193,6 @@ class _GameScreenState extends State<GameScreen>
     _animatingDestTube = destTubeIndex;
     _animatingDestSlots = hiddenSlots;
 
-    final sourceTubeIndex = move.sourceTube;
     final sourceTube = _controller.board.tubes[sourceTubeIndex];
     final currentSourceBalls = sourceTube.balls.length;
 
@@ -233,6 +268,9 @@ class _GameScreenState extends State<GameScreen>
 
   void _onRestart() {
     _cancelAnimation();
+    _hintSourceTube = null;
+    _hintDestTube = null;
+    AudioHapticService.instance.playRestart();
     setState(() {
       _controller.restart();
     });
@@ -240,13 +278,58 @@ class _GameScreenState extends State<GameScreen>
 
   void _onUndo() {
     if (_isAnimating || _controller.inputLocked) return;
+    _hintSourceTube = null;
+    _hintDestTube = null;
+    AudioHapticService.instance.playUndo();
     setState(() {
       _controller.undo();
     });
   }
 
+  void _onHint() {
+    if (_isAnimating || _controller.inputLocked || _controller.solved) return;
+    final hint = _controller.getHint();
+    if (hint != null) {
+      AudioHapticService.instance.playSelect();
+      setState(() {
+        _hintSourceTube = hint.sourceTube;
+        _hintDestTube = hint.destinationTube;
+      });
+    } else {
+      AudioHapticService.instance.playInvalid();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No further moves or already solved!'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
+  void _onAddTube() {
+    if (_isAnimating || _controller.inputLocked || _controller.solved) return;
+    final added = _controller.addEmptyTube();
+    if (added) {
+      AudioHapticService.instance.playSelect();
+      setState(() {
+        _hintSourceTube = null;
+        _hintDestTube = null;
+      });
+    } else {
+      AudioHapticService.instance.playInvalid();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Maximum chamber capacity reached (8)!'),
+          duration: Duration(seconds: 1),
+        ),
+      );
+    }
+  }
+
   void _onNextLevel() {
     _cancelAnimation();
+    _hintSourceTube = null;
+    _hintDestTube = null;
     if (_currentLevelNumber < PrototypeLevels.totalLevels) {
       setState(() {
         _currentLevelNumber++;
@@ -259,10 +342,12 @@ class _GameScreenState extends State<GameScreen>
 
   void _onSelectLevelFromMap(int level) {
     _cancelAnimation();
+    _hintSourceTube = null;
+    _hintDestTube = null;
     setState(() {
       _currentLevelNumber = level;
       _controller = GameController(
-        initialBoard: PrototypeLevels.getLevel(_currentLevelNumber),
+        initialBoard: LevelCatalog.getLevel(_currentLevelNumber),
       );
       _currentNavIndex = 0; // Return to Play screen
     });
@@ -375,9 +460,11 @@ class _GameScreenState extends State<GameScreen>
                       const SizedBox(width: 5),
                       Flexible(
                         child: Text(
-                          _controller.selectedTubeIndex != null
-                              ? 'Select target containment chamber'
-                              : 'Select chamber to transfer energy orb',
+                          _hintSourceTube != null && _hintDestTube != null
+                              ? 'Hint: Transfer Chamber ${_hintSourceTube! + 1} -> ${_hintDestTube! + 1}'
+                              : (_controller.selectedTubeIndex != null
+                                    ? 'Select target containment chamber'
+                                    : 'Select chamber to transfer energy orb'),
                           style: const TextStyle(
                             color: Color(0xFF9DADCA),
                             fontSize: 11,
@@ -410,13 +497,13 @@ class _GameScreenState extends State<GameScreen>
                               tubeCount) -
                           16.0;
 
-                      // Height based ball size: tube total vertical space is (4 * ballSize + 54) + 24 (text+shelf)
+                      // Height based ball size: tube total vertical space is (4 * ballSize + 56) + 28 (text+platform+paddings)
                       final double targetBallSizeHeight =
-                          (availableHeight - 85) / 4.2;
+                          (availableHeight - 88) / 4.25;
 
                       final double computedBallSize = math
                           .min(targetBallSizeWidth, targetBallSizeHeight)
-                          .clamp(18.0, 46.0);
+                          .clamp(18.0, 52.0);
                       _currentBallSize = computedBallSize;
 
                       final double tubeWidth = computedBallSize + 16.0;
@@ -475,6 +562,9 @@ class _GameScreenState extends State<GameScreen>
                                                   _controller
                                                       .selectedTubeIndex ==
                                                   i,
+                                              isHinted:
+                                                  _hintSourceTube == i ||
+                                                  _hintDestTube == i,
                                               ballSize: computedBallSize,
                                               hiddenBallSlots:
                                                   _animatingDestTube == i
@@ -510,7 +600,7 @@ class _GameScreenState extends State<GameScreen>
                                       ],
                                     ],
                                   ),
-                                  const SizedBox(height: 8),
+                                  const SizedBox(height: 6),
                                   // Orb Lab Containment Docking Deck Platform
                                   Container(
                                     width: math.min(
@@ -518,20 +608,20 @@ class _GameScreenState extends State<GameScreen>
                                       (board.tubeCount *
                                           (computedBallSize + 22.0)),
                                     ),
-                                    height: 8,
+                                    height: 4,
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF1B2A4B),
-                                      borderRadius: BorderRadius.circular(4),
+                                      borderRadius: BorderRadius.circular(2),
                                       border: Border.all(
                                         color: const Color(0xFF49DCEC)
-                                            .withAlpha(60),
+                                            .withAlpha(50),
                                         width: 1,
                                       ),
                                       boxShadow: [
                                         BoxShadow(
                                           color: const Color(0xFF49DCEC)
-                                              .withAlpha(35),
-                                          blurRadius: 10,
+                                              .withAlpha(30),
+                                          blurRadius: 8,
                                           spreadRadius: 1,
                                         ),
                                       ],
@@ -556,16 +646,23 @@ class _GameScreenState extends State<GameScreen>
                 BoosterToolbar(
                   onUndo: _onUndo,
                   onRestart: _onRestart,
+                  onAddTube: _onAddTube,
+                  onHint: _onHint,
                   canUndo: _controller.canUndo && !_isAnimating,
                   canRestart: !_isAnimating,
+                  canAddTube: _controller.board.tubeCount < 8 && !_isAnimating,
+                  canHint: !_isAnimating,
                 ),
 
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
 
                 // Reserve space for Bottom Navigation Bar
-                const SizedBox(height: 64),
+                const SizedBox(height: 54),
               ],
             ),
+
+            // Celebration Particles
+            if (isSolved) const Positioned.fill(child: CelebrationParticles()),
 
             // Victory Modal Sheet
             if (isSolved)

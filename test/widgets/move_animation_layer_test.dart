@@ -8,7 +8,7 @@ import 'package:ball_sort/widgets/tube_widget.dart';
 
 void main() {
   group('MoveAnimationLayer Unit and Widget Tests', () {
-    test('calculatePosition 3-stage kinematic path', () {
+    test('calculatePosition continuous parametric arc trajectory', () {
       const data = TransferAnimationData(
         ballType: BallType.red,
         sourceBallCenter: Offset(100, 300),
@@ -25,29 +25,54 @@ void main() {
       // t = 0.0: starts at source ball center
       expect(layer.calculatePosition(0.0), equals(const Offset(100, 300)));
 
-      // t = 0.25 (end of lift): at lift clearance height
-      expect(layer.calculatePosition(0.25), equals(const Offset(100, 100)));
+      // Early lift (t = 0.10): vertically exiting source tube mouth (x stays 100)
+      final earlyLift = layer.calculatePosition(0.10);
+      expect(earlyLift.dx, equals(100.0));
+      expect(earlyLift.dy, inExclusiveRange(94.0, 300.0));
 
-      // t in (0.0, 0.25): purely vertical motion (x stays 100)
-      final midLift = layer.calculatePosition(0.125);
-      expect(midLift.dx, equals(100.0));
-      expect(midLift.dy, inExclusiveRange(100.0, 300.0));
+      // Mid-flight apex (t = 0.50): approximately at horizontal midpoint and cresting at arc apex
+      final apex = layer.calculatePosition(0.50);
+      expect(apex.dx, closeTo(150.0, 2.0));
+      expect(apex.dy, equals(94.0)); // clearance 100 - arc crest 6.0
 
-      // t = 0.70 (end of horizontal travel): at dest column at clearance height
-      expect(layer.calculatePosition(0.70), equals(const Offset(200, 100)));
+      // Descent into destination (t = 0.90): horizontally aligned with destination column
+      final lateDescent = layer.calculatePosition(0.90);
+      expect(lateDescent.dx, equals(200.0));
+      expect(lateDescent.dy, inExclusiveRange(94.0, 300.0));
 
-      // t in (0.25, 0.70): purely horizontal motion (y stays 100)
-      final midTravel = layer.calculatePosition(0.475);
-      expect(midTravel.dx, inExclusiveRange(100.0, 200.0));
-      expect(midTravel.dy, equals(100.0));
-
-      // t in (0.70, 1.0): purely vertical drop (x stays 200)
-      final midDrop = layer.calculatePosition(0.85);
-      expect(midDrop.dx, equals(200.0));
-      expect(midDrop.dy, inExclusiveRange(100.0, 300.0));
-
-      // t = 1.0: drops to destination ball center
+      // t = 1.0: settles precisely at destination ball center
       expect(layer.calculatePosition(1.0), equals(const Offset(200, 300)));
+    });
+
+    test('calculatePosition grouped move lead-follow micro-stagger', () {
+      const data = TransferAnimationData(
+        ballType: BallType.blue,
+        sourceBallCenters: [Offset(100, 260), Offset(100, 300)],
+        destBallCenters: [Offset(200, 260), Offset(200, 300)],
+        clearanceY: 100,
+        ballSize: 40,
+      );
+
+      final layer = MoveAnimationLayer(
+        animation: const AlwaysStoppedAnimation(0.0),
+        data: data,
+      );
+
+      expect(data.ballCount, equals(2));
+
+      // At start (t = 0.0), both balls start at their respective source slots
+      expect(layer.calculatePosition(0.0, 0), equals(const Offset(100, 260)));
+      expect(layer.calculatePosition(0.0, 1), equals(const Offset(100, 300)));
+
+      // Lead ball (index 0) initiates flight ahead of trailing ball (index 1)
+      final leadMid = layer.calculatePosition(0.20, 0);
+      final trailMid = layer.calculatePosition(0.20, 1);
+      // Lead ball has progressed further along its trajectory (lower dy = higher in the air)
+      expect(leadMid.dy, lessThan(trailMid.dy));
+
+      // At completion (t = 1.0), both balls settle at their respective dest slots
+      expect(layer.calculatePosition(1.0, 0), equals(const Offset(200, 260)));
+      expect(layer.calculatePosition(1.0, 1), equals(const Offset(200, 300)));
     });
 
     testWidgets('renders flying ball at calculated position', (

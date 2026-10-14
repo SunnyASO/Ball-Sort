@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
 
+import '../levels/level_catalog.dart';
+import '../services/progression_service.dart';
 import '../theme/app_theme.dart';
 
 /// Level Map Screen matching Stitch Screen 3.
 ///
 /// Features:
-/// - Realm 3: "Neon Nebula" Header card with 70% progress bar and Mystery Box timer.
-/// - S-curve winding trail with Level Nodes (38, 39, 40, 41, 42 PLAY, 45 HARD PUZZLE, 46, 50 Chapter Pinnacle).
-/// - Current Active Level 42 glowing node with Play pulse.
-/// - Bottom sticky "Level 42 PLAY" action bar.
+/// - Orb Lab Sector Progression Header card with progress bar.
+/// - S-curve winding trail with Level Nodes for all available levels.
+/// - Current Active Level glowing node with Play pulse.
+/// - Bottom sticky "PLAY LEVEL" action bar.
 class LevelMapScreen extends StatelessWidget {
-  final int currentLevel;
+  final int? currentLevel;
   final ValueChanged<int>? onSelectLevel;
 
-  const LevelMapScreen({super.key, this.currentLevel = 42, this.onSelectLevel});
+  const LevelMapScreen({super.key, this.currentLevel, this.onSelectLevel});
 
   @override
   Widget build(BuildContext context) {
+    final activeLevel =
+        currentLevel ?? ProgressionService.instance.currentLevel;
+    final highestUnlocked = ProgressionService.instance.highestUnlockedLevel;
+    final totalLevels = LevelCatalog.totalLevels;
+    final completedCount = (highestUnlocked - 1).clamp(0, totalLevels);
+    final progressFactor = totalLevels > 0
+        ? (completedCount / totalLevels)
+        : 0.0;
+
     return Scaffold(
       backgroundColor: AppTheme.surface,
       body: SafeArea(
@@ -52,7 +63,7 @@ class LevelMapScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: const [
                           Text(
-                            'Ball Sort',
+                            'Orb Lab',
                             style: TextStyle(
                               color: AppTheme.onSurface,
                               fontSize: 14,
@@ -60,7 +71,7 @@ class LevelMapScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            'Levels',
+                            'Sectors',
                             style: TextStyle(
                               color: AppTheme.primary,
                               fontSize: 10,
@@ -74,18 +85,10 @@ class LevelMapScreen extends StatelessWidget {
                   Row(
                     children: [
                       _StatChip(
-                        icon: Icons.favorite,
-                        iconColor: AppTheme.error,
-                        text: '5/5 Full',
+                        icon: Icons.track_changes,
+                        iconColor: AppTheme.primary,
+                        text: 'LV.$activeLevel',
                       ),
-                      const SizedBox(width: 6),
-                      _StatChip(
-                        icon: Icons.monetization_on,
-                        iconColor: AppTheme.secondary,
-                        text: '2,450',
-                      ),
-                      const SizedBox(width: 6),
-                      _StatChip(text: 'LV.42', textColor: AppTheme.tertiary),
                     ],
                   ),
                 ],
@@ -98,7 +101,7 @@ class LevelMapScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    // Realm 3 Header Card
+                    // Sector Header Card
                     Container(
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
@@ -135,7 +138,7 @@ class LevelMapScreen extends StatelessWidget {
                                           ),
                                         ),
                                         child: const Text(
-                                          'REALM 3',
+                                          'ORB LAB',
                                           style: TextStyle(
                                             color: AppTheme.primary,
                                             fontSize: 10,
@@ -144,9 +147,9 @@ class LevelMapScreen extends StatelessWidget {
                                         ),
                                       ),
                                       const SizedBox(width: 6),
-                                      const Text(
-                                        '✨ 70% Done',
-                                        style: TextStyle(
+                                      Text(
+                                        '✨ ${(progressFactor * 100).toInt()}% Done',
+                                        style: const TextStyle(
                                           color: AppTheme.secondary,
                                           fontSize: 11,
                                           fontWeight: FontWeight.w600,
@@ -156,7 +159,7 @@ class LevelMapScreen extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 6),
                                   const Text(
-                                    'Neon Nebula',
+                                    'Quantum Sectors',
                                     style: TextStyle(
                                       color: AppTheme.onSurface,
                                       fontSize: 18,
@@ -164,7 +167,7 @@ class LevelMapScreen extends StatelessWidget {
                                     ),
                                   ),
                                   const Text(
-                                    'Liquid crystal vortexes',
+                                    'Harmonic plasma containment grid',
                                     style: TextStyle(
                                       color: AppTheme.onSurfaceVariant,
                                       fontSize: 12,
@@ -172,58 +175,23 @@ class LevelMapScreen extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              // Mystery Box Badge
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 6,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.surfaceContainerLowest,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: const [
-                                    Icon(
-                                      Icons.card_giftcard,
-                                      color: AppTheme.secondary,
-                                      size: 20,
-                                    ),
-                                    Text(
-                                      'Mystery Box',
-                                      style: TextStyle(
-                                        color: AppTheme.onSurface,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    Text(
-                                      '03:42:10',
-                                      style: TextStyle(
-                                        color: AppTheme.tertiary,
-                                        fontSize: 9,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                             ],
                           ),
                           const SizedBox(height: 12),
                           // Progress Bar
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
-                              Text(
-                                'Current Progress',
+                            children: [
+                              const Text(
+                                'Containment Progress',
                                 style: TextStyle(
                                   color: AppTheme.onSurfaceVariant,
                                   fontSize: 11,
                                 ),
                               ),
                               Text(
-                                '35 / 50 Levels',
-                                style: TextStyle(
+                                '$completedCount / $totalLevels Levels',
+                                style: const TextStyle(
                                   color: AppTheme.primary,
                                   fontSize: 11,
                                   fontWeight: FontWeight.bold,
@@ -240,7 +208,7 @@ class LevelMapScreen extends StatelessWidget {
                               child: Align(
                                 alignment: Alignment.centerLeft,
                                 child: FractionallySizedBox(
-                                  widthFactor: 0.70,
+                                  widthFactor: progressFactor,
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       gradient: LinearGradient(
@@ -264,7 +232,7 @@ class LevelMapScreen extends StatelessWidget {
 
                     // Level Path Map (Custom S-Curve Visual Layout)
                     _LevelMapTrail(
-                      currentLevel: currentLevel,
+                      currentLevel: activeLevel,
                       onSelectLevel: onSelectLevel,
                     ),
 
@@ -284,7 +252,7 @@ class LevelMapScreen extends StatelessWidget {
           width: double.infinity,
           height: 52,
           child: ElevatedButton(
-            onPressed: () => onSelectLevel?.call(1),
+            onPressed: () => onSelectLevel?.call(activeLevel),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppTheme.secondaryContainer,
               foregroundColor: AppTheme.onSecondaryContainer,
@@ -296,12 +264,12 @@ class LevelMapScreen extends StatelessWidget {
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Icon(Icons.play_arrow_rounded, size: 24),
-                SizedBox(width: 8),
+              children: [
+                const Icon(Icons.play_arrow_rounded, size: 24),
+                const SizedBox(width: 8),
                 Text(
-                  'PLAY LEVEL 1',
-                  style: TextStyle(
+                  'PLAY LEVEL $activeLevel',
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.8,
@@ -320,14 +288,8 @@ class _StatChip extends StatelessWidget {
   final IconData? icon;
   final Color? iconColor;
   final String text;
-  final Color? textColor;
 
-  const _StatChip({
-    this.icon,
-    this.iconColor,
-    required this.text,
-    this.textColor,
-  });
+  const _StatChip({this.icon, this.iconColor, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -346,8 +308,8 @@ class _StatChip extends StatelessWidget {
           ],
           Text(
             text,
-            style: TextStyle(
-              color: textColor ?? AppTheme.onSurface,
+            style: const TextStyle(
+              color: AppTheme.onSurface,
               fontSize: 11,
               fontWeight: FontWeight.bold,
             ),
@@ -366,56 +328,27 @@ class _LevelMapTrail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final highestUnlocked = ProgressionService.instance.highestUnlockedLevel;
+    final offsets = [0.0, 50.0, -45.0, 60.0, 0.0, -55.0, 45.0, -50.0];
+
     return Column(
       children: [
-        // Level 50: Chapter Pinnacle
-        _MapNode(
-          level: 50,
-          label: 'Chapter Pinnacle',
-          isLocked: true,
-          offsetX: 0,
-        ),
-        const SizedBox(height: 24),
-
-        // Level 46: Locked
-        _MapNode(level: 46, isLocked: true, offsetX: -60),
-        const SizedBox(height: 24),
-
-        // Level 45: Hard Puzzle Boss Node
-        _MapNode(level: 45, label: 'HARD PUZZLE', isBoss: true, offsetX: 60),
-        const SizedBox(height: 24),
-
-        // Level 44: Locked
-        _MapNode(level: 44, isLocked: true, offsetX: 0),
-        const SizedBox(height: 24),
-
-        // Level 42: Active Level (Glow pulse)
-        _MapNode(
-          level: 42,
-          isActive: true,
-          offsetX: -40,
-          onTap: () => onSelectLevel?.call(1),
-        ),
-        const SizedBox(height: 24),
-
-        // Level 41: Completed (3 stars)
-        _MapNode(
-          level: 41,
-          isCompleted: true,
-          stars: 3,
-          offsetX: 50,
-          onTap: () => onSelectLevel?.call(1),
-        ),
-        const SizedBox(height: 24),
-
-        // Level 40: Completed (3 stars)
-        _MapNode(
-          level: 40,
-          isCompleted: true,
-          stars: 3,
-          offsetX: 0,
-          onTap: () => onSelectLevel?.call(1),
-        ),
+        for (int lvl = LevelCatalog.totalLevels; lvl >= 1; lvl--) ...[
+          _MapNode(
+            level: lvl,
+            label: lvl == LevelCatalog.totalLevels
+                ? 'PINNACLE CORE'
+                : (lvl % 5 == 0 ? 'SECTOR PINNACLE' : null),
+            isBoss: lvl % 5 == 0,
+            isActive: lvl == currentLevel,
+            isCompleted: lvl < highestUnlocked,
+            isLocked: lvl > highestUnlocked,
+            stars: ProgressionService.instance.getStars(lvl),
+            offsetX: offsets[lvl % offsets.length],
+            onTap: () => onSelectLevel?.call(lvl),
+          ),
+          const SizedBox(height: 24),
+        ],
       ],
     );
   }

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'dart:ui' show lerpDouble;
 
 import 'package:flutter/material.dart';
@@ -70,10 +71,12 @@ class TransferAnimationData {
 
 /// Centralized presentation layer rendering the temporary moving balls during transfer.
 ///
-/// Follows a 3-stage kinematic path for each ball:
-/// 1. Lift (0.0 - 0.25, ~100ms): Ball lifts vertically from source slot to clearance height.
-/// 2. Horizontal (0.25 - 0.70, ~180ms): Ball travels smoothly above tubes to destination column.
-/// 3. Drop (0.70 - 1.00, ~120ms): Ball drops vertically into the destination slot.
+/// Features a continuous parametric arc trajectory:
+/// - Smooth vertical emergence from source chamber
+/// - Seamless parabolic curve cresting gracefully over intervening chambers
+/// - Continuous tangent velocities (no robotic 90-degree corners or midpoint stops)
+/// - Fluid grouped train dynamics with lead-follow micro-stagger
+/// - Controlled arrival deceleration with subtle landing micro-cushion
 class MoveAnimationLayer extends StatelessWidget {
   final Animation<double> animation;
   final TransferAnimationData data;
@@ -84,46 +87,57 @@ class MoveAnimationLayer extends StatelessWidget {
     required this.data,
   });
 
+  /// Computes local progress $\tau \in [0, 1]$ for ball at [ballIndex]
+  /// applying lead-follow micro-staggering for grouped moves.
+  double localProgress(double t, int ballIndex) {
+    final count = data.ballCount;
+    if (count <= 1) return t.clamp(0.0, 1.0);
+
+    const double staggerStep = 0.04;
+    final totalSpan = 1.0 - (staggerStep * (count - 1));
+    final ballStart = staggerStep * ballIndex;
+    return ((t - ballStart) / totalSpan).clamp(0.0, 1.0);
+  }
+
   /// Computes the exact center (x, y) coordinates of the moving ball at index [ballIndex]
-  /// at progress [t] in [0, 1].
-  ///
-  /// For grouped moves, ball [i] uses [clearanceY - (i * (ballSize + 4.0))] during flight
-  /// to maintain clean vertical stacking without overlapping.
+  /// at global progress [t] in [0, 1] using a continuous parametric arc.
   Offset calculatePosition(double t, [int ballIndex = 0]) {
+    final tau = localProgress(t, ballIndex);
     final start = data.effectiveSourceCenters[ballIndex];
     final end = data.effectiveDestCenters[ballIndex];
     final spacing = data.ballSize + 4.0;
     final ballClearance = data.clearanceY - (ballIndex * spacing);
 
-    if (t <= 0.25) {
-      // Stage 1: Lift (0% to 25%)
-      final p = (t / 0.25).clamp(0.0, 1.0);
-      final curved = Curves.easeOutQuad.transform(p);
-      final y = lerpDouble(start.dy, ballClearance, curved)!;
-      return Offset(start.dx, y);
-    } else if (t <= 0.70) {
-      // Stage 2: Horizontal transfer (25% to 70%)
-      final double curved;
-      if (t >= 0.70) {
-        curved = 1.0;
-      } else {
-        final p = ((t - 0.25) / 0.45).clamp(0.0, 1.0);
-        curved = Curves.easeInOutCubic.transform(p);
-      }
-      final x = lerpDouble(start.dx, end.dx, curved)!;
-      return Offset(x, ballClearance);
+    // Dynamic arc crest height scaled subtly with horizontal distance
+    final double dxAbs = (end.dx - start.dx).abs();
+    final double arcCrest = (dxAbs < 1.0) ? 0.0 : math.min(14.0, dxAbs * 0.06);
+    final double apexY = ballClearance - arcCrest;
+
+    // Continuous Horizontal Trajectory X(tau)
+    final double px;
+    if (tau <= 0.18) {
+      px = 0.0;
+    } else if (tau >= 0.82) {
+      px = 1.0;
     } else {
-      // Stage 3: Drop (70% to 100%)
-      final double curved;
-      if (t >= 1.0) {
-        curved = 1.0;
-      } else {
-        final p = ((t - 0.70) / 0.30).clamp(0.0, 1.0);
-        curved = Curves.easeInQuad.transform(p);
-      }
-      final y = lerpDouble(ballClearance, end.dy, curved)!;
-      return Offset(end.dx, y);
+      final s = (tau - 0.18) / 0.64;
+      px = Curves.easeInOutCubic.transform(s);
     }
+    final x = lerpDouble(start.dx, end.dx, px)!;
+
+    // Continuous Vertical Trajectory Y(tau) with smooth apex tangent
+    final double y;
+    if (tau <= 0.50) {
+      final s = (tau / 0.50).clamp(0.0, 1.0);
+      final curved = Curves.easeOutQuad.transform(s);
+      y = lerpDouble(start.dy, apexY, curved)!;
+    } else {
+      final s = ((tau - 0.50) / 0.50).clamp(0.0, 1.0);
+      final curved = Curves.easeInOutQuad.transform(s);
+      y = lerpDouble(apexY, end.dy, curved)!;
+    }
+
+    return Offset(x, y);
   }
 
   @override
@@ -141,14 +155,27 @@ class MoveAnimationLayer extends StatelessWidget {
               Builder(
                 builder: (context) {
                   final pos = calculatePosition(t, i);
+                  final tau = localProgress(t, i);
+
+                  // Subtle landing micro-cushion upon touching down
+                  double squash = 0.0;
+                  if (tau >= 0.88) {
+                    final p = (tau - 0.88) / 0.12;
+                    squash = math.sin(p * math.pi) * 0.06;
+                  }
+
                   return Positioned(
                     left: pos.dx - (size / 2),
                     top: pos.dy - (size / 2),
                     child: IgnorePointer(
-                      child: BallWidget(
-                        key: ValueKey('moving_ball_$i'),
-                        type: data.getBallType(i),
-                        size: size,
+                      child: Transform.scale(
+                        scaleX: 1.0 + squash,
+                        scaleY: 1.0 - squash,
+                        child: BallWidget(
+                          key: ValueKey('moving_ball_$i'),
+                          type: data.getBallType(i),
+                          size: size,
+                        ),
                       ),
                     ),
                   );
