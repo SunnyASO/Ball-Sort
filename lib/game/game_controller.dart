@@ -1,3 +1,4 @@
+import '../services/hint_service.dart';
 import 'ball_move.dart';
 import 'ball_sort_board.dart';
 import 'board_solver.dart';
@@ -62,6 +63,28 @@ class GameController {
       return null;
     }
     return solver.getNextOptimalMove(_board);
+  }
+
+  /// Asynchronously calculates the next optimal move towards solving the current board.
+  /// Runs on a background isolate if search space exceeds the fast-path threshold.
+  Future<SolverResult> getHintAsync({
+    int fastThreshold = 150,
+    int maxStates = 30000,
+  }) {
+    if (_inputLocked || solved) {
+      return Future.value(
+        const SolverResult(
+          solution: null,
+          statesExplored: 0,
+          exceededBudget: false,
+        ),
+      );
+    }
+    return HintService.instance.requestHint(
+      board: _board,
+      fastThreshold: fastThreshold,
+      maxStates: maxStates,
+    );
   }
 
   /// Handles player tapping a tube at [tubeIndex].

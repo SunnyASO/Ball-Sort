@@ -19,10 +19,12 @@ class LevelMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final activeLevel =
-        currentLevel ?? ProgressionService.instance.currentLevel;
-    final highestUnlocked = ProgressionService.instance.highestUnlockedLevel;
     final totalLevels = LevelCatalog.totalLevels;
+    final activeLevel =
+        (currentLevel ?? ProgressionService.instance.currentLevel)
+            .clamp(1, totalLevels)
+            .toInt();
+    final highestUnlocked = ProgressionService.instance.highestUnlockedLevel;
     final completedCount = (highestUnlocked - 1).clamp(0, totalLevels);
     final progressFactor = totalLevels > 0
         ? (completedCount / totalLevels)
@@ -326,6 +328,26 @@ class _LevelMapTrail extends StatelessWidget {
 
   const _LevelMapTrail({required this.currentLevel, this.onSelectLevel});
 
+  static const _sectorNames = [
+    'Training Protocols',
+    'Intermediate Containment',
+    'Advanced Plasma Routing',
+    'Quantum Isolation',
+    'Entropy Calibration',
+    'Resonance Flux',
+    'Subatomic Synthesis',
+    'Magnetic Chambering',
+    'Superposition Routing',
+    'Singularity Isolation',
+  ];
+
+  static String _getSectorName(int sector) {
+    if (sector >= 1 && sector <= _sectorNames.length) {
+      return _sectorNames[sector - 1];
+    }
+    return 'Sector $sector';
+  }
+
   @override
   Widget build(BuildContext context) {
     final highestUnlocked = ProgressionService.instance.highestUnlockedLevel;
@@ -334,11 +356,16 @@ class _LevelMapTrail extends StatelessWidget {
     return Column(
       children: [
         for (int lvl = LevelCatalog.totalLevels; lvl >= 1; lvl--) ...[
+          if (lvl % 5 == 0)
+            _SectorBanner(
+              sectorNumber: lvl ~/ 5,
+              title: _getSectorName(lvl ~/ 5),
+            ),
           _MapNode(
             level: lvl,
             label: lvl == LevelCatalog.totalLevels
-                ? 'PINNACLE CORE'
-                : (lvl % 5 == 0 ? 'SECTOR PINNACLE' : null),
+                ? 'SINGULARITY PINNACLE'
+                : (lvl % 5 == 0 ? 'SECTOR ${lvl ~/ 5} BOSS' : null),
             isBoss: lvl % 5 == 0,
             isActive: lvl == currentLevel,
             isCompleted: lvl < highestUnlocked,
@@ -350,6 +377,67 @@ class _LevelMapTrail extends StatelessWidget {
           const SizedBox(height: 24),
         ],
       ],
+    );
+  }
+}
+
+class _SectorBanner extends StatelessWidget {
+  final int sectorNumber;
+  final String title;
+
+  const _SectorBanner({required this.sectorNumber, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 20, bottom: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppTheme.surfaceContainerHigh.withAlpha(200),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: AppTheme.primary.withAlpha(80),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(60),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppTheme.primaryContainer.withAlpha(120),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              'SECTOR $sectorNumber',
+              style: const TextStyle(
+                color: AppTheme.primary,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              color: AppTheme.onSurface,
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 0.4,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

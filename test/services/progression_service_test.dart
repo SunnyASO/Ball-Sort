@@ -73,5 +73,68 @@ void main() {
       await service.setCurrentLevel(4);
       expect(service.currentLevel, equals(4));
     });
+
+    test('Level 20 completion unlocks Level 21 seamlessly', () async {
+      final service = ProgressionService.instance;
+
+      // Simulate player reaching Level 20
+      await service.recordLevelCompletion(level: 19, moves: 12);
+      expect(service.highestUnlockedLevel, equals(20));
+      expect(service.isLevelUnlocked(20), isTrue);
+      expect(service.isLevelUnlocked(21), isFalse);
+
+      // Complete Level 20
+      final stars = await service.recordLevelCompletion(
+        level: 20,
+        moves: 15,
+        parMoves: 15,
+      );
+
+      expect(stars, equals(3));
+      expect(service.highestUnlockedLevel, equals(21));
+      expect(service.isLevelUnlocked(21), isTrue);
+      expect(service.isLevelUnlocked(22), isFalse);
+    });
+
+    test('Level 50 completion completes campaign cleanly', () async {
+      final service = ProgressionService.instance;
+
+      // Simulate player completing Level 50
+      final stars = await service.recordLevelCompletion(
+        level: 50,
+        moves: 18,
+        parMoves: 18,
+      );
+
+      expect(stars, equals(3));
+      expect(service.getStars(50), equals(3));
+      expect(service.getBestMoves(50), equals(18));
+      expect(service.isLevelUnlocked(50), isTrue);
+    });
+
+    test('star ratings and best moves persist across all 50 levels on reinitialization', () async {
+      final service = ProgressionService.instance;
+
+      for (int i = 1; i <= 50; i++) {
+        await service.recordLevelCompletion(level: i, moves: 10 + (i % 5));
+      }
+
+      // Re-initialize from the underlying mock storage
+      await service.initialize();
+
+      for (int i = 1; i <= 50; i++) {
+        expect(
+          service.getStars(i),
+          greaterThan(0),
+          reason: 'Level $i stars must be preserved across reload',
+        );
+        expect(
+          service.getBestMoves(i),
+          equals(10 + (i % 5)),
+          reason: 'Level $i best moves must be preserved across reload',
+        );
+        expect(service.isLevelUnlocked(i), isTrue);
+      }
+    });
   });
 }

@@ -272,6 +272,7 @@ class BoosterToolbar extends StatelessWidget {
   final bool canRestart;
   final bool canAddTube;
   final bool canHint;
+  final bool isHintLoading;
 
   const BoosterToolbar({
     super.key,
@@ -283,6 +284,7 @@ class BoosterToolbar extends StatelessWidget {
     this.canRestart = true,
     this.canAddTube = true,
     this.canHint = true,
+    this.isHintLoading = false,
   });
 
   @override
@@ -354,8 +356,9 @@ class BoosterToolbar extends StatelessWidget {
                 icon: Icons.psychology_outlined,
                 label: 'Hint',
                 iconColor: const Color(0xFFFFD700),
-                isEnabled: canHint,
-                onTap: canHint ? onHint : null,
+                isEnabled: canHint && !isHintLoading,
+                isLoading: isHintLoading,
+                onTap: (canHint && !isHintLoading) ? onHint : null,
               ),
             ),
           ],
@@ -370,6 +373,7 @@ class _LabActionButton extends StatelessWidget {
   final String label;
   final Color iconColor;
   final bool isEnabled;
+  final bool isLoading;
   final VoidCallback? onTap;
 
   const _LabActionButton({
@@ -378,6 +382,7 @@ class _LabActionButton extends StatelessWidget {
     required this.label,
     required this.iconColor,
     required this.isEnabled,
+    this.isLoading = false,
     this.onTap,
   });
 
@@ -411,11 +416,22 @@ class _LabActionButton extends StatelessWidget {
                     ? activeColor.withAlpha(30)
                     : GameTheme.surfaceDim,
               ),
-              child: Icon(
-                icon,
-                color: isEnabled ? activeColor : disabledColor,
-                size: 19,
-              ),
+              child: isLoading
+                  ? Center(
+                      child: SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: activeColor,
+                        ),
+                      ),
+                    )
+                  : Icon(
+                      icon,
+                      color: isEnabled ? activeColor : disabledColor,
+                      size: 19,
+                    ),
             ),
             const SizedBox(height: 4),
             Text(

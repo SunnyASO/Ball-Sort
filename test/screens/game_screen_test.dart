@@ -394,5 +394,142 @@ void main() {
         }
       },
     );
+
+    testWidgets(
+      'completing Level 20 shows Next Level button and transitions to Level 21',
+      (WidgetTester tester) async {
+        final nearSolvedLevel20 = BallSortBoard([
+          Tube(capacity: 4, balls: [BallType.red, BallType.red, BallType.red]),
+          Tube(capacity: 4, balls: [BallType.red]),
+          Tube(
+            capacity: 4,
+            balls: [BallType.blue, BallType.blue, BallType.blue, BallType.blue],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [
+              BallType.green,
+              BallType.green,
+              BallType.green,
+              BallType.green,
+            ],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [
+              BallType.yellow,
+              BallType.yellow,
+              BallType.yellow,
+              BallType.yellow,
+            ],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [
+              BallType.purple,
+              BallType.purple,
+              BallType.purple,
+              BallType.purple,
+            ],
+          ),
+          Tube(capacity: 4),
+        ]);
+
+        final controller = GameController(initialBoard: nearSolvedLevel20);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: GameScreen(
+              controller: controller,
+              initialLevelNumber: 20,
+              maxLevels: 50,
+            ),
+          ),
+        );
+
+        // Tap Tube 1 -> Tube 0 to complete Level 20
+        await tester.tap(find.byKey(const ValueKey('tube_1')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('tube_0')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('victory_banner')), findsOneWidget);
+        expect(find.byKey(const Key('next_level_button')), findsOneWidget);
+
+        // Tap Next Level button
+        await tester.tap(find.byKey(const Key('next_level_button')));
+        await tester.pumpAndSettle();
+
+        // Level 21 loaded!
+        expect(find.text('Level 21'), findsOneWidget);
+        expect(find.text('Moves: 0'), findsOneWidget);
+        expect(find.byKey(const Key('victory_banner')), findsNothing);
+
+        // Level 21 has 6 tubes
+        expect(find.byType(TubeWidget), findsNWidgets(6));
+      },
+    );
+
+    testWidgets(
+      'completing Level 50 shows campaign victory without Next Level button',
+      (WidgetTester tester) async {
+        final nearSolvedLevel50 = BallSortBoard([
+          Tube(
+            capacity: 4,
+            balls: [BallType.purple, BallType.purple, BallType.purple],
+          ),
+          Tube(capacity: 4, balls: [BallType.purple]),
+          Tube(
+            capacity: 4,
+            balls: [BallType.blue, BallType.blue, BallType.blue, BallType.blue],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [
+              BallType.green,
+              BallType.green,
+              BallType.green,
+              BallType.green,
+            ],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [
+              BallType.yellow,
+              BallType.yellow,
+              BallType.yellow,
+              BallType.yellow,
+            ],
+          ),
+          Tube(
+            capacity: 4,
+            balls: [BallType.red, BallType.red, BallType.red, BallType.red],
+          ),
+          Tube(capacity: 4),
+        ]);
+
+        final controller = GameController(initialBoard: nearSolvedLevel50);
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: GameScreen(
+              controller: controller,
+              initialLevelNumber: 50,
+              maxLevels: 50,
+            ),
+          ),
+        );
+
+        // Tap Tube 1 -> Tube 0 to complete Level 50
+        await tester.tap(find.byKey(const ValueKey('tube_1')));
+        await tester.pump();
+        await tester.tap(find.byKey(const ValueKey('tube_0')));
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const Key('victory_banner')), findsOneWidget);
+        expect(find.byKey(const Key('next_level_button')), findsNothing);
+        expect(find.byKey(const Key('play_again_button')), findsOneWidget);
+      },
+    );
   });
 }

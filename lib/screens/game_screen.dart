@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../game/ball_move.dart';
 import '../game/game_controller.dart';
 import '../levels/level_catalog.dart';
-import '../levels/prototype_levels.dart';
 import '../services/audio_haptic_service.dart';
 import '../services/progression_service.dart';
 import '../theme/app_theme.dart';
@@ -24,12 +23,14 @@ class GameScreen extends StatefulWidget {
   final GameController? controller;
   final int initialLevelNumber;
   final Duration transferDuration;
+  final int? maxLevels;
 
   const GameScreen({
     super.key,
     this.controller,
     this.initialLevelNumber = 1,
     this.transferDuration = const Duration(milliseconds: 400),
+    this.maxLevels,
   });
 
   @override
@@ -52,9 +53,17 @@ class _GameScreenState extends State<GameScreen>
 
   int? _hintSourceTube;
   int? _hintDestTube;
+  bool _isHintLoading = false;
+  int _hintRequestId = 0;
 
   final GlobalKey _playAreaKey = GlobalKey();
   final ScrollController _scrollController = ScrollController();
+
+  int get _effectiveMaxLevels =>
+      widget.maxLevels ??
+      (widget.controller != null && widget.initialLevelNumber == 6
+          ? 6
+          : LevelCatalog.totalLevels);
 
   @override
   void initState() {
@@ -63,7 +72,7 @@ class _GameScreenState extends State<GameScreen>
     _controller =
         widget.controller ??
         GameController(
-          initialBoard: PrototypeLevels.getLevel(_currentLevelNumber),
+          initialBoard: LevelCatalog.getLevel(_currentLevelNumber),
         );
     _animationController = AnimationController(
       vsync: this,
@@ -107,9 +116,10 @@ class _GameScreenState extends State<GameScreen>
     if (widget.initialLevelNumber != oldWidget.initialLevelNumber &&
         widget.controller == null) {
       _cancelAnimation();
+      _invalidateHint();
       _currentLevelNumber = widget.initialLevelNumber;
       _controller = GameController(
-        initialBoard: PrototypeLevels.getLevel(_currentLevelNumber),
+        initialBoard: LevelCatalog.getLevel(_currentLevelNumber),
       );
     }
     if (widget.transferDuration != oldWidget.transferDuration) {
@@ -119,10 +129,18 @@ class _GameScreenState extends State<GameScreen>
 
   @override
   void dispose() {
+    _invalidateHint();
     _animationController.removeStatusListener(_onAnimationStatus);
     _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _invalidateHint() {
+    _hintRequestId++;
+    _isHintLoading = false;
+    _hintSourceTube = null;
+    _hintDestTube = null;
   }
 
   void _cancelAnimation() {
@@ -134,6 +152,7 @@ class _GameScreenState extends State<GameScreen>
       _animatingDestSlots = null;
       _controller.setInputLocked(false);
     }
+    _invalidateHint();
   }
 
   RenderBox? _findTubeRenderBox(int index) {
@@ -162,6 +181,7 @@ class _GameScreenState extends State<GameScreen>
 
     final move = _controller.handleTubeTap(index);
     if (move != null) {
+      _invalidateHint();
       _startTransferAnimation(move);
     } else {
       setState(() {});
@@ -268,8 +288,7 @@ class _GameScreenState extends State<GameScreen>
 
   void _onRestart() {
     _cancelAnimation();
-    _hintSourceTube = null;
-    _hintDestTube = null;
+    _invalidateHint();
     AudioHapticService.instance.playRestart();
     setState(() {
       _controller.restart();
@@ -278,43 +297,90 @@ class _GameScreenState extends State<GameScreen>
 
   void _onUndo() {
     if (_isAnimating || _controller.inputLocked) return;
-    _hintSourceTube = null;
-    _hintDestTube = null;
+    _invalidateHint();
     AudioHapticService.instance.playUndo();
     setState(() {
       _controller.undo();
     });
   }
 
-  void _onHint() {
-    if (_isAnimating || _controller.inputLocked || _controller.solved) return;
-    final hint = _controller.getHint();
-    if (hint != null) {
-      AudioHapticService.instance.playSelect();
+  Future<void> _onHint() async {
+    if (_isAnimating ||
+        _isHintLoading ||
+        _controller.inputLocked ||
+        _controller.solved) {
+      return;
+    }
+
+    final requestId = ++_hintRequestId;
+    final boardSnapshot = _controller.board;
+
+    setState(() {
+      _isHintLoading = true;
+    });
+
+    try {
+      final result = await _controller.getHintAsync();
+
+      if (!mounted ||
+          _hintRequestId != requestId ||
+          _controller.board != boardSnapshot) {
+        // Discard stale result if user moved, undid, restarted, navigated, or screen disposed
+        return;
+      }
+
       setState(() {
-        _hintSourceTube = hint.sourceTube;
-        _hintDestTube = hint.destinationTube;
+        _isHintLoading = false;
       });
-    } else {
-      AudioHapticService.instance.playInvalid();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No further moves or already solved!'),
-          duration: Duration(seconds: 1),
-        ),
-      );
+
+      if (result.isSolved && result.solution!.isNotEmpty) {
+        final hint = result.solution!.first;
+        AudioHapticService.instance.playSelect();
+        setState(() {
+          _hintSourceTube = hint.sourceTube;
+          _hintDestTube = hint.destinationTube;
+        });
+      } else if (result.exceededBudget) {
+        AudioHapticService.instance.playInvalid();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Search limit reached for this complex configuration!',
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      } else {
+        AudioHapticService.instance.playInvalid();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('No further moves or already solved!'),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+    } catch (_) {
+      if (mounted && _hintRequestId == requestId) {
+        setState(() {
+          _isHintLoading = false;
+        });
+      }
+    } finally {
+      if (mounted && _hintRequestId == requestId && _isHintLoading) {
+        setState(() {
+          _isHintLoading = false;
+        });
+      }
     }
   }
 
   void _onAddTube() {
     if (_isAnimating || _controller.inputLocked || _controller.solved) return;
+    _invalidateHint();
     final added = _controller.addEmptyTube();
     if (added) {
       AudioHapticService.instance.playSelect();
-      setState(() {
-        _hintSourceTube = null;
-        _hintDestTube = null;
-      });
+      setState(() {});
     } else {
       AudioHapticService.instance.playInvalid();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -328,13 +394,12 @@ class _GameScreenState extends State<GameScreen>
 
   void _onNextLevel() {
     _cancelAnimation();
-    _hintSourceTube = null;
-    _hintDestTube = null;
-    if (_currentLevelNumber < PrototypeLevels.totalLevels) {
+    _invalidateHint();
+    if (_currentLevelNumber < _effectiveMaxLevels) {
       setState(() {
         _currentLevelNumber++;
         _controller = GameController(
-          initialBoard: PrototypeLevels.getLevel(_currentLevelNumber),
+          initialBoard: LevelCatalog.getLevel(_currentLevelNumber),
         );
       });
     }
@@ -342,8 +407,7 @@ class _GameScreenState extends State<GameScreen>
 
   void _onSelectLevelFromMap(int level) {
     _cancelAnimation();
-    _hintSourceTube = null;
-    _hintDestTube = null;
+    _invalidateHint();
     setState(() {
       _currentLevelNumber = level;
       _controller = GameController(
@@ -372,7 +436,7 @@ class _GameScreenState extends State<GameScreen>
 
     final board = _controller.board;
     final isSolved = _controller.solved && !_isAnimating;
-    final hasNextLevel = _currentLevelNumber < PrototypeLevels.totalLevels;
+    final hasNextLevel = _currentLevelNumber < _effectiveMaxLevels;
 
     return Scaffold(
       backgroundColor: AppTheme.surface,
@@ -651,7 +715,8 @@ class _GameScreenState extends State<GameScreen>
                   canUndo: _controller.canUndo && !_isAnimating,
                   canRestart: !_isAnimating,
                   canAddTube: _controller.board.tubeCount < 8 && !_isAnimating,
-                  canHint: !_isAnimating,
+                  canHint: !_isAnimating && !_isHintLoading,
+                  isHintLoading: _isHintLoading,
                 ),
 
                 const SizedBox(height: 8),
@@ -713,19 +778,31 @@ class _GameScreenState extends State<GameScreen>
               icon: Icons.sports_esports,
               label: 'Play',
               isActive: _currentNavIndex == 0,
-              onTap: () => setState(() => _currentNavIndex = 0),
+              onTap: () {
+                if (_currentNavIndex != 0) {
+                  setState(() => _currentNavIndex = 0);
+                }
+              },
             ),
             _NavItem(
               icon: Icons.map,
               label: 'Levels',
               isActive: _currentNavIndex == 1,
-              onTap: () => setState(() => _currentNavIndex = 1),
+              onTap: () {
+                _cancelAnimation();
+                _invalidateHint();
+                setState(() => _currentNavIndex = 1);
+              },
             ),
             _NavItem(
               icon: Icons.shopping_bag,
               label: 'Shop',
               isActive: _currentNavIndex == 2,
-              onTap: () => setState(() => _currentNavIndex = 2),
+              onTap: () {
+                _cancelAnimation();
+                _invalidateHint();
+                setState(() => _currentNavIndex = 2);
+              },
             ),
           ],
         ),
