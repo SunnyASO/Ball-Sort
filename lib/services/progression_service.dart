@@ -23,6 +23,9 @@ class ProgressionService {
   bool get soundEnabled => _soundEnabled;
   bool get hapticsEnabled => _hapticsEnabled;
 
+  /// Total stars earned across all levels.
+  int get totalStars => _stars.values.fold(0, (sum, s) => sum + s);
+
   /// Initializes the service from persistent storage.
   Future<void> initialize({SharedPreferences? mockPrefs}) async {
     _prefs = mockPrefs ?? await SharedPreferences.getInstance();

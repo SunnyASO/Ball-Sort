@@ -10,6 +10,7 @@ class GameHeader extends StatelessWidget {
   final VoidCallback? onUndo;
   final bool canUndo;
   final bool canRestart;
+  final VoidCallback? onHome;
 
   const GameHeader({
     super.key,
@@ -19,6 +20,7 @@ class GameHeader extends StatelessWidget {
     this.onUndo,
     this.canUndo = false,
     this.canRestart = true,
+    this.onHome,
   });
 
   @override
@@ -50,67 +52,83 @@ class GameHeader extends StatelessWidget {
             children: [
               // Logo & Title: Ball Sort / ORB LAB
               Flexible(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 28,
-                      height: 28,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const RadialGradient(
-                          colors: [
-                            GameTheme.cyanGlow,
-                            GameTheme.cyanAccent,
-                            GameTheme.blueAccent,
-                          ],
-                          stops: [0.0, 0.45, 1.0],
+                child: InkWell(
+                  key: const Key('header_home_button'),
+                  onTap: onHome,
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        if (onHome != null) ...[
+                          const Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: GameTheme.cyanAccent,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 6),
+                        ],
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: const RadialGradient(
+                              colors: [
+                                GameTheme.cyanGlow,
+                                GameTheme.cyanAccent,
+                                GameTheme.blueAccent,
+                              ],
+                              stops: [0.0, 0.45, 1.0],
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: GameTheme.cyanAccent.withAlpha(140),
+                                blurRadius: 8,
+                              ),
+                            ],
+                          ),
+                          child: const Icon(
+                            Icons.science_outlined,
+                            color: GameTheme.background,
+                            size: 16,
+                          ),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: GameTheme.cyanAccent.withAlpha(140),
-                            blurRadius: 8,
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                'Ball Sort',
+                                style: TextStyle(
+                                  color: GameTheme.textPrimary,
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 0.3,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                'ORB LAB',
+                                style: TextStyle(
+                                  color: GameTheme.cyanAccent,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.science_outlined,
-                        color: GameTheme.background,
-                        size: 16,
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: const [
-                          Text(
-                            'Ball Sort',
-                            style: TextStyle(
-                              color: GameTheme.textPrimary,
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'ORB LAB',
-                            style: TextStyle(
-                              color: GameTheme.cyanAccent,
-                              fontSize: 9,
-                              fontWeight: FontWeight.w700,
-                              letterSpacing: 1.2,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 

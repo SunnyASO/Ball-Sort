@@ -47,6 +47,30 @@ class LevelMapScreen extends StatelessWidget {
                 children: [
                   Row(
                     children: [
+                      if (Navigator.of(context).canPop()) ...[
+                        GestureDetector(
+                          key: const Key('map_back_button'),
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppTheme.surfaceContainerLow,
+                              border: Border.all(
+                                color: AppTheme.primary.withAlpha(80),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.arrow_back_ios_new_rounded,
+                              color: AppTheme.primary,
+                              size: 16,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                       Container(
                         width: 32,
                         height: 32,

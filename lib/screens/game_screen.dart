@@ -8,6 +8,7 @@ import '../levels/level_catalog.dart';
 import '../services/audio_haptic_service.dart';
 import '../services/progression_service.dart';
 import '../theme/app_theme.dart';
+import '../theme/game_theme.dart';
 import '../widgets/celebration_particles.dart';
 import '../widgets/game_header.dart';
 import '../widgets/move_animation_layer.dart';
@@ -402,6 +403,7 @@ class _GameScreenState extends State<GameScreen>
           initialBoard: LevelCatalog.getLevel(_currentLevelNumber),
         );
       });
+      ProgressionService.instance.setCurrentLevel(_currentLevelNumber);
     }
   }
 
@@ -415,13 +417,184 @@ class _GameScreenState extends State<GameScreen>
       );
       _currentNavIndex = 0; // Return to Play screen
     });
+    ProgressionService.instance.setCurrentLevel(_currentLevelNumber);
+  }
+
+  void _handleBackNavigation() {
+    // 1. If currently viewing Map (1) or Shop (2), back returns to Play (0)
+    if (_currentNavIndex != 0) {
+      setState(() => _currentNavIndex = 0);
+      return;
+    }
+
+    // 2. If in active play and moves have been made and not yet solved:
+    if (_controller.moveCount > 0 && !_controller.solved) {
+      _showPauseModal();
+      return;
+    }
+
+    // 3. Otherwise, if Navigator can pop, pop back to HomeScreen
+    if (Navigator.of(context).canPop()) {
+      Navigator.of(context).pop();
+    }
+  }
+
+  void _showPauseModal() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(180),
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: GameTheme.surfaceElevated,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: GameTheme.cyanAccent.withAlpha(80),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: GameTheme.cyanAccent.withAlpha(40),
+                  blurRadius: 24,
+                  spreadRadius: 2,
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: GameTheme.cyanAccent.withAlpha(30),
+                    border: Border.all(
+                      color: GameTheme.cyanAccent.withAlpha(80),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.pause_rounded,
+                    color: GameTheme.cyanAccent,
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'MISSION PAUSED',
+                  style: TextStyle(
+                    color: GameTheme.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.5,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Sector $_currentLevelNumber containment in progress.\nMoves made: ${_controller.moveCount}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: GameTheme.textSecondary,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                // Resume Button
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    key: const Key('pause_resume_button'),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: GameTheme.cyanAccent,
+                      foregroundColor: GameTheme.background,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'RESUME MISSION',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Restart Level
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton(
+                    key: const Key('pause_restart_button'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      _onRestart();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: GameTheme.violetAccent.withAlpha(90),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    child: const Text(
+                      'RESTART CHAMBER',
+                      style: TextStyle(
+                        color: GameTheme.violetAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Exit to Menu
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: TextButton(
+                    key: const Key('pause_exit_button'),
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: const Text(
+                      'EXIT TO HEADQUARTERS',
+                      style: TextStyle(
+                        color: GameTheme.textTertiary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget content;
     // If Levels or Shop tab is active, render their screens
     if (_currentNavIndex == 1) {
-      return Stack(
+      content = Stack(
         children: [
           LevelMapScreen(
             currentLevel: _currentLevelNumber,
@@ -431,117 +604,126 @@ class _GameScreenState extends State<GameScreen>
         ],
       );
     } else if (_currentNavIndex == 2) {
-      return Stack(children: [const ShopScreen(), _buildBottomNavBar()]);
-    }
+      content = Stack(children: [const ShopScreen(), _buildBottomNavBar()]);
+    } else {
+      final board = _controller.board;
+      final isSolved = _controller.solved && !_isAnimating;
+      final hasNextLevel = _currentLevelNumber < _effectiveMaxLevels;
 
-    final board = _controller.board;
-    final isSolved = _controller.solved && !_isAnimating;
-    final hasNextLevel = _currentLevelNumber < _effectiveMaxLevels;
-
-    return Scaffold(
-      backgroundColor: AppTheme.surface,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Ambient Orb Lab Background Atmosphere Glows
-            Positioned(
-              top: 20,
-              left: -30,
-              child: Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF49DCEC).withAlpha(16),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 180,
-              right: -40,
-              child: Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFFA178FF).withAlpha(14),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 100,
-              left: 40,
-              child: Container(
-                width: 260,
-                height: 260,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: const Color(0xFF5A8DFF).withAlpha(16),
-                ),
-              ),
-            ),
-
-            // Main Play Column
-            Column(
-              children: [
-                // Top Cosmic HUD
-                GameHeader(
-                  levelNumber: _currentLevelNumber,
-                  moveCount: _controller.moveCount,
-                  onRestart: _onRestart,
-                  onUndo: _onUndo,
-                  canUndo: _controller.canUndo && !_isAnimating,
-                  canRestart: !_isAnimating,
-                ),
-
-                const SizedBox(height: 8),
-
-                // Interactive Containment Protocol Hint Pill
-                Container(
-                  constraints: BoxConstraints(
-                    maxWidth: MediaQuery.sizeOf(context).width - 32,
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12.0,
-                    vertical: 4.5,
-                  ),
+      content = Scaffold(
+        backgroundColor: AppTheme.surface,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              // Ambient Orb Lab Background Atmosphere Glows
+              Positioned(
+                top: 20,
+                left: -30,
+                child: Container(
+                  width: 240,
+                  height: 240,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF121D38).withAlpha(220),
-                    borderRadius: BorderRadius.circular(16.0),
-                    border: Border.all(
-                      color: const Color(0xFF49DCEC).withAlpha(45),
-                      width: 1.0,
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF49DCEC).withAlpha(16),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 180,
+                right: -40,
+                child: Container(
+                  width: 220,
+                  height: 220,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFFA178FF).withAlpha(14),
+                  ),
+                ),
+              ),
+              Positioned(
+                bottom: 100,
+                left: 40,
+                child: Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: const Color(0xFF5A8DFF).withAlpha(16),
+                  ),
+                ),
+              ),
+
+              // Main Play Column
+              Column(
+                children: [
+                  // Top Cosmic HUD
+                  GameHeader(
+                    levelNumber: _currentLevelNumber,
+                    moveCount: _controller.moveCount,
+                    onRestart: _onRestart,
+                    onUndo: _onUndo,
+                    canUndo: _controller.canUndo && !_isAnimating,
+                    canRestart: !_isAnimating,
+                    onHome: _handleBackNavigation,
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  // Interactive Containment Protocol Hint Pill
+                  Container(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.sizeOf(context).width - 32,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0,
+                      vertical: 4.5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF121D38).withAlpha(220),
+                      borderRadius: BorderRadius.circular(16.0),
+                      border: Border.all(
+                        color: const Color(0xFF49DCEC).withAlpha(45),
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.track_changes_outlined,
+                          color: Color(0xFF49DCEC),
+                          size: 13,
+                        ),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            _hintSourceTube != null && _hintDestTube != null
+                                ? 'Hint: Transfer Chamber ${_hintSourceTube! + 1} -> ${_hintDestTube! + 1}'
+                                : (_controller.selectedTubeIndex != null
+                                      ? 'Select target containment chamber'
+                                      : (_currentLevelNumber == 1 &&
+                                                _controller.moveCount == 0
+                                            ? 'MISSION INIT: Tap chamber to extract orbs'
+                                            : (_currentLevelNumber == 2 &&
+                                                      _controller.moveCount == 0
+                                                  ? 'QUANTUM TIP: Matching adjacent orbs move together'
+                                                  : (_currentLevelNumber == 3 &&
+                                                            _controller.moveCount == 0
+                                                        ? 'GOAL: Group identical energy orbs to stabilize'
+                                                        : 'Select chamber to transfer energy orb')))),
+                            style: const TextStyle(
+                              color: Color(0xFF9DADCA),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.2,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(
-                        Icons.track_changes_outlined,
-                        color: Color(0xFF49DCEC),
-                        size: 13,
-                      ),
-                      const SizedBox(width: 5),
-                      Flexible(
-                        child: Text(
-                          _hintSourceTube != null && _hintDestTube != null
-                              ? 'Hint: Transfer Chamber ${_hintSourceTube! + 1} -> ${_hintDestTube! + 1}'
-                              : (_controller.selectedTubeIndex != null
-                                    ? 'Select target containment chamber'
-                                    : 'Select chamber to transfer energy orb'),
-                          style: const TextStyle(
-                            color: Color(0xFF9DADCA),
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: 0.2,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
 
                 // Tubes Playfield
                 Expanded(
@@ -749,6 +931,16 @@ class _GameScreenState extends State<GameScreen>
           ],
         ),
       ),
+    );
+  }
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (bool didPop, dynamic result) {
+        if (didPop) return;
+        _handleBackNavigation();
+      },
+      child: content,
     );
   }
 
