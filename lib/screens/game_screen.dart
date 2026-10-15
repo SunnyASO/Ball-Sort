@@ -14,6 +14,7 @@ import '../widgets/game_header.dart';
 import '../widgets/move_animation_layer.dart';
 import '../widgets/tube_widget.dart';
 import '../widgets/victory_overlay.dart';
+import '../widgets/settings_sheet.dart';
 import 'level_map_screen.dart';
 import 'shop_screen.dart';
 
@@ -288,6 +289,143 @@ class _GameScreenState extends State<GameScreen>
   }
 
   void _onRestart() {
+    if (_isAnimating || _controller.inputLocked) return;
+
+    if (_controller.moveCount > 0 && !_controller.solved) {
+      _showRestartConfirmationDialog();
+    } else {
+      _performRestart();
+    }
+  }
+
+  void _showRestartConfirmationDialog() {
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(180),
+      builder: (ctx) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              color: GameTheme.surfaceElevated,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(
+                color: GameTheme.violetAccent.withAlpha(80),
+                width: 1.5,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(160),
+                  blurRadius: 24,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: GameTheme.violetAccent.withAlpha(30),
+                    border: Border.all(
+                      color: GameTheme.violetAccent.withAlpha(80),
+                    ),
+                  ),
+                  child: const Icon(
+                    Icons.refresh_rounded,
+                    color: GameTheme.violetAccent,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const Text(
+                  'Restart this level?',
+                  style: TextStyle(
+                    color: GameTheme.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Current moves in Sector $_currentLevelNumber will be lost.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: GameTheme.textSecondary,
+                    fontSize: 13,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    // Cancel Action
+                    Expanded(
+                      child: OutlinedButton(
+                        key: const Key('restart_cancel_button'),
+                        onPressed: () => Navigator.of(ctx).pop(),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          side: BorderSide(
+                            color: GameTheme.textTertiary.withAlpha(80),
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(
+                            color: GameTheme.textSecondary,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    // Restart Action
+                    Expanded(
+                      child: ElevatedButton(
+                        key: const Key('restart_confirm_button'),
+                        onPressed: () {
+                          Navigator.of(ctx).pop();
+                          _performRestart();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          backgroundColor: GameTheme.violetAccent,
+                          foregroundColor: GameTheme.textPrimary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Restart Level',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _performRestart() {
     _cancelAnimation();
     _invalidateHint();
     AudioHapticService.instance.playRestart();
@@ -554,6 +692,41 @@ class _GameScreenState extends State<GameScreen>
                         color: GameTheme.violetAccent,
                         fontWeight: FontWeight.bold,
                         fontSize: 13,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                // Lab Settings
+                SizedBox(
+                  width: double.infinity,
+                  height: 44,
+                  child: OutlinedButton.icon(
+                    key: const Key('pause_settings_button'),
+                    icon: const Icon(
+                      Icons.settings_outlined,
+                      size: 16,
+                      color: GameTheme.cyanAccent,
+                    ),
+                    label: const Text(
+                      'LAB SETTINGS',
+                      style: TextStyle(
+                        color: GameTheme.cyanAccent,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        letterSpacing: 0.8,
+                      ),
+                    ),
+                    onPressed: () {
+                      AudioHapticService.instance.playSelect();
+                      SettingsSheet.show(context);
+                    },
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(
+                        color: GameTheme.cyanAccent.withAlpha(90),
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
                       ),
                     ),
                   ),

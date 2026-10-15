@@ -4,6 +4,7 @@ import '../levels/level_catalog.dart';
 import '../services/audio_haptic_service.dart';
 import '../services/progression_service.dart';
 import '../theme/game_theme.dart';
+import '../widgets/settings_sheet.dart';
 import 'game_screen.dart';
 import 'level_map_screen.dart';
 import 'shop_screen.dart';
@@ -205,38 +206,70 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
 
-                      // Star Rating Tally
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: GameTheme.surfaceElevated,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: const Color(0xFFFFD700).withAlpha(80),
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Icon(
-                              Icons.star_rounded,
-                              color: Color(0xFFFFD700),
-                              size: 16,
+                      Row(
+                        children: [
+                          // Star Rating Tally
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
                             ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$_totalStars / $maxStars',
-                              style: const TextStyle(
-                                color: GameTheme.textPrimary,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                            decoration: BoxDecoration(
+                              color: GameTheme.surfaceElevated,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: const Color(0xFFFFD700).withAlpha(80),
                               ),
                             ),
-                          ],
-                        ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.star_rounded,
+                                  color: Color(0xFFFFD700),
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '$_totalStars / $maxStars',
+                                  style: const TextStyle(
+                                    color: GameTheme.textPrimary,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+
+                          // Settings Button
+                          InkWell(
+                            key: const Key('home_settings_button'),
+                            onTap: () async {
+                              AudioHapticService.instance.playSelect();
+                              await SettingsSheet.show(context);
+                              if (mounted) _refreshProgress();
+                            },
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              width: 32,
+                              height: 32,
+                              decoration: BoxDecoration(
+                                color: GameTheme.surfaceElevated,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: GameTheme.cyanAccent.withAlpha(80),
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.settings_outlined,
+                                color: GameTheme.cyanAccent,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

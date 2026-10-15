@@ -138,9 +138,12 @@ void main() {
 
         expect(find.text('Moves: 1'), findsOneWidget);
 
-        // Press restart
+        // Press restart and confirm in dialog
         await tester.tap(find.byKey(const Key('restart_button')));
-        await tester.pump();
+        await tester.pumpAndSettle();
+        expect(find.text('Restart this level?'), findsOneWidget);
+        await tester.tap(find.byKey(const Key('restart_confirm_button')));
+        await tester.pumpAndSettle();
 
         // Verify reset to 0 moves and initial ball distribution
         expect(find.text('Moves: 0'), findsOneWidget);

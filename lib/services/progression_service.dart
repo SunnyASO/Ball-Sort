@@ -1,5 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'audio_haptic_service.dart';
+
 /// Manages level unlock progression, star ratings, best moves, and user preferences.
 ///
 /// Implements dual-layer storage: synchronous memory cache for instantaneous UI access
@@ -34,6 +36,8 @@ class ProgressionService {
     _currentLevel = _prefs?.getInt('currentLevel') ?? 1;
     _soundEnabled = _prefs?.getBool('soundEnabled') ?? true;
     _hapticsEnabled = _prefs?.getBool('hapticsEnabled') ?? true;
+    AudioHapticService.instance.soundEnabled = _soundEnabled;
+    AudioHapticService.instance.hapticsEnabled = _hapticsEnabled;
 
     // Load stars and best moves
     for (int i = 1; i <= 50; i++) {
@@ -111,12 +115,14 @@ class ProgressionService {
   /// Toggles sound effects.
   Future<void> setSoundEnabled(bool enabled) async {
     _soundEnabled = enabled;
+    AudioHapticService.instance.soundEnabled = enabled;
     await _prefs?.setBool('soundEnabled', enabled);
   }
 
   /// Toggles haptic feedback.
   Future<void> setHapticsEnabled(bool enabled) async {
     _hapticsEnabled = enabled;
+    AudioHapticService.instance.hapticsEnabled = enabled;
     await _prefs?.setBool('hapticsEnabled', enabled);
   }
 
@@ -126,6 +132,10 @@ class ProgressionService {
     _currentLevel = 1;
     _stars.clear();
     _bestMoves.clear();
+    _soundEnabled = true;
+    _hapticsEnabled = true;
+    AudioHapticService.instance.soundEnabled = true;
+    AudioHapticService.instance.hapticsEnabled = true;
     await _prefs?.clear();
   }
 }
